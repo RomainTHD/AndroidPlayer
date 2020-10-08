@@ -1,0 +1,7 @@
+.idea
+.gradle
+gradle
+gradlew*
+*.properties
+*.gradle
+*.pro
