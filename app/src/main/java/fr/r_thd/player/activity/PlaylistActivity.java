@@ -1,14 +1,16 @@
-package fr.r_thd.player;
+package fr.r_thd.player.activity;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
 
-public class VideoOffline extends AppCompatActivity {
+import fr.r_thd.player.R;
+
+public class PlaylistActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_video_offline);
+        setContentView(R.layout.activity_playlist);
     }
 }
