@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
     xmlns:tools="http://schemas.android.com/tools">
 
     <LinearLayout
@@ -26,12 +26,12 @@
             android:layout_weight="0.5"
             android:textAppearance="@style/TextAppearance.AppCompat" />
 
-        <ImageView
-            android:id="@+id/item_edit_button"
+        <!-- ImageView
+            android:id="@+id/playlist_edit_button"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:padding="10dp"
             android:layout_weight="1.5"
-            android:src="@drawable/ic_edit" />
+            android:src="@drawable/ic_edit" / -->
     </LinearLayout>
 </LinearLayout>

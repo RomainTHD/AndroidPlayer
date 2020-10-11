@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ListAdapter;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -26,13 +27,13 @@ public class HomeActivity extends AppCompatActivity {
 
     static {
         Playlist p1 = new Playlist("Ma playlist");
-        p1.add(new Music("test", R.raw.abc));
-        p1.add(new Music("test2", R.raw.abc));
+        p1.add(new Music("test", null));
+        p1.add(new Music("test2", null));
 
         Playlist p2 = new Playlist("Autre playlist");
-        p2.add(new Music("test3", R.raw.abc));
-        p2.add(new Music("test4", R.raw.abc));
-        p2.add(new Music("test5", R.raw.abc));
+        p2.add(new Music("test3", null));
+        p2.add(new Music("test4", null));
+        p2.add(new Music("test5", null));
 
         playlistList.add(p1);
         playlistList.add(p2);
@@ -47,7 +48,8 @@ public class HomeActivity extends AppCompatActivity {
 
         final RecyclerView list = findViewById(R.id.playlist_list);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        list.setAdapter(new PlaylistAdapter(playlistList) {
+
+        final PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlistList) {
             @Override
             public void onItemClick(View v) {
                 Playlist playlist = playlistList.get(list.getChildViewHolder(v).getAdapterPosition());
@@ -57,27 +59,62 @@ public class HomeActivity extends AppCompatActivity {
             }
 
             @Override
-            public boolean onItemLongClick(View v) {
-                Toast.makeText(getApplicationContext(), "Détails d'une playlist", Toast.LENGTH_SHORT).show();
-                return true;
-            }
-        });
-
-        findViewById(R.id.button_create).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+            public boolean onItemLongClick(final View v) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-                builder.setTitle("Nom de la playlist");
+                builder.setTitle("Modifier le nom de la playlist");
 
                 final EditText input = new EditText(HomeActivity.this);
                 input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
+                input.setText(playlistList.get(list.getChildViewHolder(v).getAdapterPosition()).getName());
                 builder.setView(input);
 
                 builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        String name = input.getText().toString();
-                        playlistList.add(new Playlist(name));
+                        String name = input.getText().toString().trim();
+
+                        if (!name.isEmpty()) {
+                            playlistList.get(list.getChildViewHolder(v).getAdapterPosition()).setName(name);
+                            notifyDataSetChanged();
+                        }
+                    }
+                });
+
+                builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+
+                return true;
+            }
+        };
+
+        list.setAdapter(playlistAdapter);
+
+        findViewById(R.id.button_create).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
+                builder.setTitle("Créer une playlist");
+
+                final EditText input = new EditText(HomeActivity.this);
+                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
+                input.setHint("Nom de la playlist");
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        String name = input.getText().toString().trim();
+
+                        if (!name.isEmpty()) {
+                            playlistList.add(new Playlist(name));
+                            playlistAdapter.notifyDataSetChanged();
+                        }
                     }
                 });
 
@@ -99,5 +136,9 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
         });
+    }
+
+    public void update() {
+
     }
 }
