@@ -11,6 +11,7 @@ import fr.r_thd.player.storage.utility.JSONFileStorage;
 public class PlaylistJsonFileStorage extends JSONFileStorage<Playlist> {
     private static final String NAME = "playlist";
     private static final String PLAYLIST_ID = "id";
+    private static final String PLAYLIST_PATH = "path";
 
     public PlaylistJsonFileStorage(Context context, String name) {
         super(context, name);
@@ -34,7 +35,8 @@ public class PlaylistJsonFileStorage extends JSONFileStorage<Playlist> {
     @Override
     protected Playlist jsonObjectToObject(JSONObject jsonObject) {
         try {
-            return new Playlist(Integer.parseInt(jsonObject.getString(PLAYLIST_ID)));
+            // return new Playlist(Integer.parseInt(jsonObject.getString(PLAYLIST_ID)));
+            return new Playlist(jsonObject.getString(PLAYLIST_PATH));
         }
         catch (JSONException e) {
             e.printStackTrace();

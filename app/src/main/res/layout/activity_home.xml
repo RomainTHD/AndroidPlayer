@@ -55,14 +55,15 @@
             android:layout_height="wrap_content">
 
             <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/playlist_list"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="vertical" />
-
+                android:orientation="vertical"
+                android:scrollbars="vertical" />
         </LinearLayout>
     </LinearLayout>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
+    <!-- com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_add_from_url"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -70,7 +71,7 @@
         android:layout_margin="16dp"
         android:tint="@android:color/white"
         android:src="@drawable/ic_add"
-        />
+        / -->
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_create"

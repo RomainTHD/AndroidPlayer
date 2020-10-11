@@ -7,18 +7,15 @@ import java.util.Random;
 public class Playlist extends ArrayList<Music> implements Serializable {
     private int id;
     private int index;
+    private String name;
 
     private static int GLOBAL_ID = 1;
 
-    public Playlist() {
+    public Playlist(String name) {
         this.index = 0;
+        this.name = name;
         this.id = GLOBAL_ID;
         GLOBAL_ID ++;
-    }
-
-    public Playlist(int id) {
-        this();
-        this.id = id;
     }
 
     public int getId() {
@@ -27,6 +24,10 @@ public class Playlist extends ArrayList<Music> implements Serializable {
 
     public Music get() {
         return get(index);
+    }
+
+    public String getName() {
+        return name;
     }
 
     @Override
