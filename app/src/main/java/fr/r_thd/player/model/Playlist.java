@@ -1,20 +1,55 @@
 package fr.r_thd.player.model;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Random;
 
+/**
+ * Playlist de musiques
+ */
 public class Playlist implements Serializable {
-    private ArrayList<Music> content;
-    private ArrayList<Integer> indexes;
-
-    private int id;
-    private int currentIndex;
-    private String name;
-
+    /**
+     * ID globaux
+     * TODO: remplacer par LAST_ID ?
+     */
     private static int GLOBAL_ID = 1;
 
-    public Playlist(String name) {
+    /**
+     * Contenu, musiques
+     */
+    @NonNull
+    private ArrayList<Music> content;
+
+    /**
+     * Indexes, ordre des musiques
+     */
+    @NonNull
+    private ArrayList<Integer> indexes;
+
+    /**
+     * ID de la playlist
+     */
+    private int id;
+
+    /**
+     * Index de lecture courant
+     */
+    private int currentIndex;
+
+    /**
+     * Titre
+     */
+    @NonNull
+    private String name;
+
+    /**
+     * Constructeur
+     *
+     * @param name Nom de la playlist
+     */
+    public Playlist(@NonNull String name) {
         this.content = new ArrayList<>();
         this.indexes = new ArrayList<>();
         this.currentIndex = 0;
@@ -23,15 +58,28 @@ public class Playlist implements Serializable {
         GLOBAL_ID ++;
     }
 
-    public void setName(String name) {
+    /**
+     * @param name Nom
+     */
+    public void setName(@NonNull String name) {
         this.name = name;
     }
 
-    public void add(Music m) {
+    /**
+     * Ajoute une musique
+     *
+     * @param m Musique
+     */
+    public void add(@NonNull Music m) {
         content.add(m);
         indexes.add(indexes.size());
     }
 
+    /**
+     * Supprime une musique
+     *
+     * @param i Index
+     */
     public void remove(int i) {
         content.remove(i);
         indexes.remove((Integer) i);

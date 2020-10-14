@@ -12,11 +12,29 @@ import androidx.recyclerview.widget.RecyclerView;
 import fr.r_thd.player.R;
 import fr.r_thd.player.model.Playlist;
 
+/**
+ * Adapter de musique
+ */
 public abstract class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder> {
+    /**
+     * Holder de view
+     */
     static class MusicHolder extends RecyclerView.ViewHolder {
+        /**
+         * Preview
+         */
         private ImageView preview;
+
+        /**
+         * Titre
+         */
         private TextView title;
 
+        /**
+         * Constructeur
+         *
+         * @param itemView Item
+         */
         public MusicHolder(@NonNull View itemView) {
             super(itemView);
             preview = itemView.findViewById(R.id.item_preview);
@@ -32,6 +50,9 @@ public abstract class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Mus
         }
     }
 
+    /**
+     * Playlist associée
+     */
     private Playlist playlist;
 
     public MusicAdapter(Playlist playlist) {
@@ -72,7 +93,13 @@ public abstract class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Mus
         return playlist.size();
     }
 
+    /**
+     * On item click
+     */
     public abstract void onItemClick(View v);
 
+    /**
+     * On item long click
+     */
     public abstract boolean onItemLongClick(View v);
 }

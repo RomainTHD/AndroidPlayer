@@ -5,26 +5,47 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.provider.OpenableColumns;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
+/**
+ * Utility d'URI
+ */
 public abstract class UriUtility {
-    public static String getFileName(Uri uri, ContentResolver contentResolver) {
+    /**
+     * FileName from URI
+     *
+     * @param uri URI
+     * @param contentResolver Content resolver
+     *
+     * @return File name
+     */
+    @NonNull
+    public static String getFileName(@NonNull Uri uri, @NonNull ContentResolver contentResolver) {
         String result = null;
+
         if (uri.getScheme().equals("content")) {
             Cursor cursor = contentResolver.query(uri, null, null, null, null);
+
             try {
                 if (cursor != null && cursor.moveToFirst()) {
                     result = cursor.getString(cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME));
                 }
-            } finally {
+            }
+            finally {
                 cursor.close();
             }
         }
+
         if (result == null) {
             result = uri.getPath();
             int cut = result.lastIndexOf('/');
+
             if (cut != -1) {
                 result = result.substring(cut + 1);
             }
         }
+
         return result;
     }
 }

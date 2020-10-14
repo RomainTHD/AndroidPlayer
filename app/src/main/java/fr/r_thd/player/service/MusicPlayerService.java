@@ -9,24 +9,37 @@ import android.widget.Toast;
 
 import java.io.IOException;
 
-import fr.r_thd.player.R;
 import fr.r_thd.player.activity.MusicPlayerActivity;
 
+/**
+ * Service de lecture de musique
+ */
 public class MusicPlayerService extends Service implements MediaPlayer.OnPreparedListener {
+    /**
+     * Music player
+     */
     private MediaPlayer musicPlayer;
 
+    /**
+     * Service lié
+     */
     public IBinder onBind(Intent intent) {
         return null;
     }
 
+    /**
+     * Service créé
+     */
     @Override
     public void onCreate() {
         super.onCreate();
-        // Uri test = Uri.parse("file:///android_asset/song.mp3");
         musicPlayer = new MediaPlayer();
         musicPlayer.setLooping(false);
     }
 
+    /**
+     * Service lancé
+     */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         Toast.makeText(this, "Music Service started by user.", Toast.LENGTH_LONG).show();
@@ -44,6 +57,9 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         return START_STICKY;
     }
 
+    /**
+     * Service détruit
+     */
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -51,6 +67,9 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         Toast.makeText(this, "Music Service destroyed by user.", Toast.LENGTH_LONG).show();
     }
 
+    /**
+     * MediaPlayer prêt
+     */
     @Override
     public void onPrepared(MediaPlayer mp) {
         musicPlayer.start();
