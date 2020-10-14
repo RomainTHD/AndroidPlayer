@@ -24,8 +24,6 @@ import fr.r_thd.player.model.Playlist;
 import fr.r_thd.player.util.UriUtility;
 
 public class PlaylistActivity extends AppCompatActivity {
-    public static final String EXTRA_CURRENT_PLAYLIST = "EXTRA_CURRENT_PLAYLIST";
-
     private static final int REQUEST_GET_FILE = 0;
 
     private Playlist playlist;
@@ -50,7 +48,7 @@ public class PlaylistActivity extends AppCompatActivity {
             public void onItemClick(View v) {
                 playlist.setCurrentIndex(list.getChildViewHolder(v).getAdapterPosition());
                 Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-                intent.putExtra(EXTRA_CURRENT_PLAYLIST, playlist);
+                intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST, playlist);
                 startActivity(intent);
             }
 
@@ -99,7 +97,7 @@ public class PlaylistActivity extends AppCompatActivity {
                     playlist.shuffle();
                     playlist.setCurrentIndex(0);
                     Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-                    intent.putExtra(EXTRA_CURRENT_PLAYLIST, playlist);
+                    intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST, playlist);
                     startActivity(intent);
                 }
             }
