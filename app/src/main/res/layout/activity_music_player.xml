@@ -42,7 +42,7 @@
                 <View
                     android:layout_width="20dp"
                     android:layout_height="20dp"
-                    android:layout_weight="1"
+                    android:layout_weight="0.5"
                     android:visibility="invisible"/>
 
                 <SeekBar
@@ -54,7 +54,7 @@
                 <View
                     android:layout_width="0dp"
                     android:layout_height="20dp"
-                    android:layout_weight="1"
+                    android:layout_weight="0.5"
                     android:visibility="invisible"/>
             </LinearLayout>
         </LinearLayout>
@@ -87,17 +87,6 @@
                 android:layout_weight="1"
                 android:text="Next" />
         </LinearLayout>
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start Service"
-            android:textSize="25sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintLeft_toLeftOf="parent"
-            app:layout_constraintRight_toRightOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton

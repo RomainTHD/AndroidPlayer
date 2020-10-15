@@ -1,9 +1,11 @@
 package fr.r_thd.player.service;
 
+import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
+import android.os.Binder;
 import android.os.IBinder;
 import android.widget.Toast;
 
@@ -14,17 +16,31 @@ import fr.r_thd.player.activity.MusicPlayerActivity;
 /**
  * Service de lecture de musique
  */
-public class MusicPlayerService extends Service implements MediaPlayer.OnPreparedListener {
+public class MusicPlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
+    private final IBinder binder = new MusicPlayerServiceBinder();
+
+    private MusicPlayerActivity caller;
+
     /**
      * Music player
      */
     private MediaPlayer musicPlayer;
 
+    public static class MusicPlayerServiceBinder extends Binder {
+        MusicPlayerServiceBinder getService() {
+            return this;
+        }
+    }
+
+    public void setCaller(MusicPlayerActivity activity) {
+        caller = activity;
+    }
+
     /**
      * Service lié
      */
     public IBinder onBind(Intent intent) {
-        return null;
+        return binder;
     }
 
     /**
@@ -42,13 +58,12 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        Toast.makeText(this, "Music Service started by user.", Toast.LENGTH_LONG).show();
-
         try {
             Uri uri = Uri.parse((String) intent.getSerializableExtra(MusicPlayerActivity.EXTRA_URI));
             musicPlayer.setDataSource(this, uri);
             musicPlayer.setOnPreparedListener(this);
             musicPlayer.prepareAsync();
+            musicPlayer.setOnCompletionListener(this);
         }
         catch (IOException e) {
             Toast.makeText(this, "Erreur lors du chargement de la musique", Toast.LENGTH_SHORT).show();
@@ -63,8 +78,10 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public void onDestroy() {
         super.onDestroy();
-        musicPlayer.stop();
-        Toast.makeText(this, "Music Service destroyed by user.", Toast.LENGTH_LONG).show();
+
+        if (musicPlayer.isPlaying()) {
+            musicPlayer.stop();
+        }
     }
 
     /**
@@ -73,5 +90,10 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
     @Override
     public void onPrepared(MediaPlayer mp) {
         musicPlayer.start();
+    }
+
+    @Override
+    public void onCompletion(MediaPlayer mp) {
+        caller.onMusicFinished();
     }
 }

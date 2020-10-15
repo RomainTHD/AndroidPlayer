@@ -118,7 +118,7 @@ public class PlaylistActivity extends AppCompatActivity {
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
                 intent.setType("*/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
-                startActivityForResult(Intent.createChooser(intent, "TEST"), REQUEST_GET_FILE);
+                startActivityForResult(Intent.createChooser(intent, "Ajout d'une musique"), REQUEST_GET_FILE);
             }
         });
     }
@@ -130,10 +130,12 @@ public class PlaylistActivity extends AppCompatActivity {
         if (requestCode == REQUEST_GET_FILE && resultCode == RESULT_OK) {
             if (data != null) {
                 Uri fileUri = data.getData();
-                assert fileUri != null;
-                String name = UriUtility.getFileName(fileUri, getContentResolver());
-                playlist.add(new Music(name, fileUri.toString()));
-                listAdaper.notifyDataSetChanged();
+
+                if (fileUri != null) {
+                    String name = UriUtility.getFileName(fileUri, getContentResolver());
+                    playlist.add(new Music(name, fileUri.toString()));
+                    listAdaper.notifyDataSetChanged();
+                }
             }
         }
     }
