@@ -20,6 +20,7 @@ import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.PlaylistAdapter;
 import fr.r_thd.player.model.Music;
 import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.service.MusicPlayerService;
 
 public class HomeActivity extends AppCompatActivity {
     private static List<Playlist> playlistList = new ArrayList<>();
@@ -34,8 +35,11 @@ public class HomeActivity extends AppCompatActivity {
         p2.add(new Music("test4", null));
         p2.add(new Music("test5", null));
 
+        Playlist p3 = new Playlist("Playlist 3");
+
         playlistList.add(p1);
         playlistList.add(p2);
+        playlistList.add(p3);
     }
 
     public static final String EXTRA_DETAILS_PLAYLIST = "EXTRA_DETAILS_PLAYLIST";
@@ -43,6 +47,16 @@ public class HomeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        if (!MusicPlayerService.isRunning()) {
+            Intent intent = new Intent(
+                    getApplicationContext(),
+                    MusicPlayerService.class
+            );
+
+            startService(intent);
+        }
+
         setContentView(R.layout.activity_home);
 
         final RecyclerView list = findViewById(R.id.playlist_list);

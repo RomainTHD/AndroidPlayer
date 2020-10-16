@@ -1,6 +1,5 @@
 package fr.r_thd.player.service;
 
-import android.app.Activity;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
@@ -16,19 +15,35 @@ import fr.r_thd.player.activity.MusicPlayerActivity;
 /**
  * Service de lecture de musique
  */
-public class MusicPlayerService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener {
+public class MusicPlayerService extends Service implements
+        MediaPlayer.OnCompletionListener {
+
+    private static boolean isRunning = false;
+
+    private static boolean isPlaying = false;
+
+    public static boolean isRunning() {
+        return isRunning;
+    }
+
+    public static boolean isPlaying() {
+        return isPlaying;
+    }
+
     private final IBinder binder = new MusicPlayerServiceBinder();
 
     private MusicPlayerActivity caller;
+
+    private int pos = 0;
 
     /**
      * Music player
      */
     private MediaPlayer musicPlayer;
 
-    public static class MusicPlayerServiceBinder extends Binder {
-        MusicPlayerServiceBinder getService() {
-            return this;
+    public class MusicPlayerServiceBinder extends Binder {
+        public MusicPlayerService getService() {
+            return MusicPlayerService.this;
         }
     }
 
@@ -43,14 +58,38 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
         return binder;
     }
 
+    public void pause() {
+        musicPlayer.pause();
+        pos = musicPlayer.getCurrentPosition();
+        isPlaying = false;
+    }
+
+    public void play() {
+        musicPlayer.seekTo(pos);
+        musicPlayer.start();
+        isPlaying = true;
+    }
+
     /**
      * Service créé
      */
     @Override
     public void onCreate() {
         super.onCreate();
+        isRunning = true;
+        isPlaying = false;
+
         musicPlayer = new MediaPlayer();
         musicPlayer.setLooping(false);
+        musicPlayer.setOnCompletionListener(this);
+
+        /*
+        musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                mp.start();
+            }
+        });*/
     }
 
     /**
@@ -58,18 +97,31 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      */
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        return START_STICKY;
+    }
+
+    public void setMusic(String uriStr, final Boolean shouldPlay) {
+        musicPlayer.reset();
+        pos = 0;
+
         try {
-            Uri uri = Uri.parse((String) intent.getSerializableExtra(MusicPlayerActivity.EXTRA_URI));
+            Uri uri = Uri.parse(uriStr);
             musicPlayer.setDataSource(this, uri);
-            musicPlayer.setOnPreparedListener(this);
+            musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+                @Override
+                public void onPrepared(MediaPlayer mp) {
+                    if (shouldPlay) {
+                        isPlaying = true;
+                        mp.start();
+                    }
+                }
+            });
             musicPlayer.prepareAsync();
-            musicPlayer.setOnCompletionListener(this);
+            // musicPlayer.setOnCompletionListener(this);
         }
         catch (IOException e) {
             Toast.makeText(this, "Erreur lors du chargement de la musique", Toast.LENGTH_SHORT).show();
         }
-
-        return START_STICKY;
     }
 
     /**
@@ -77,23 +129,25 @@ public class MusicPlayerService extends Service implements MediaPlayer.OnPrepare
      */
     @Override
     public void onDestroy() {
-        super.onDestroy();
-
         if (musicPlayer.isPlaying()) {
             musicPlayer.stop();
         }
-    }
 
-    /**
-     * MediaPlayer prêt
-     */
-    @Override
-    public void onPrepared(MediaPlayer mp) {
-        musicPlayer.start();
+        Toast.makeText(getApplicationContext(), "destroy", Toast.LENGTH_SHORT).show();
+
+        isRunning = false;
+        super.onDestroy();
     }
 
     @Override
     public void onCompletion(MediaPlayer mp) {
         caller.onMusicFinished();
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        Toast.makeText(getApplicationContext(), "removed", Toast.LENGTH_SHORT).show();
+        // super.onTaskRemoved(rootIntent);
+        stopSelf();
     }
 }

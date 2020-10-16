@@ -3,10 +3,13 @@ package fr.r_thd.player.activity;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityManager;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.view.View;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -20,11 +23,17 @@ import fr.r_thd.player.model.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
 
 public class MusicPlayerActivity extends AppCompatActivity {
-    public static final String EXTRA_URI = "EXTRA_URI";
     public static final String EXTRA_CURRENT_PLAYLIST = "EXTRA_CURRENT_PLAYLIST";
-    public static final String EXTRA_IS_MUSIC_PLAYING = "EXTRA_IS_MUSIC_PLAYING";
+    public static final String EXTRA_SHOULD_PLAY =  "EXTRA_SHOULD_PLAY";
 
     private Playlist playlist;
+    private Music music;
+
+    private MusicPlayerService musicPlayerService;
+
+    private ServiceConnection connection;
+
+    private boolean shouldPlay;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,7 +48,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
             return;
         }
 
-        final Music music = playlist.get();
+        music = playlist.get();
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -77,18 +86,18 @@ public class MusicPlayerActivity extends AppCompatActivity {
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (isMusicServicePlaying()) {
+                if (MusicPlayerService.isPlaying()) {
                     playPauseButton.setImageResource(R.drawable.ic_play);
-                    stopMusicPlayerService();
+                    musicPlayerService.pause();
                 }
                 else {
                     playPauseButton.setImageResource(R.drawable.ic_pause);
-                    startMusicPlayerService(music.getUri());
+                    musicPlayerService.play();
                 }
             }
         });
 
-        if (isMusicServicePlaying()) {
+        if (MusicPlayerService.isPlaying()) {
             playPauseButton.setImageResource(R.drawable.ic_pause);
         }
         else {
@@ -113,31 +122,21 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        Toast.makeText(getApplicationContext(), String.valueOf(isMusicServicePlaying()), Toast.LENGTH_SHORT).show();
+        Object shouldPlayObj = getIntent()
+                .getSerializableExtra(EXTRA_SHOULD_PLAY);
 
-        Object isMusicPlayingObj = getIntent()
-                .getSerializableExtra(EXTRA_IS_MUSIC_PLAYING);
+        shouldPlay = false;
 
-        boolean isMusicPlaying = false;
-
-        if (isMusicPlayingObj != null) {
-            isMusicPlaying = (Boolean) isMusicPlayingObj;
+        if (shouldPlayObj != null) {
+            shouldPlay = (Boolean) shouldPlayObj;
         }
-
-        if (isMusicPlaying) {
-            // startMusicPlayerService(music.getUri());
-            // TODO: Marche po
-        }
-
-        // Toast.makeText(getApplicationContext(), String.valueOf(isMusicServicePlaying()) + String.valueOf(isMusicPlaying), Toast.LENGTH_SHORT).show();
     }
 
     private void startPreviousMusic() {
         playlist.previous();
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
         intent.putExtra(EXTRA_CURRENT_PLAYLIST, playlist);
-        intent.putExtra(EXTRA_IS_MUSIC_PLAYING, Boolean.valueOf(isMusicServicePlaying()));
-        stopMusicPlayerService();
+        intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
         startActivity(intent);
         finish();
     }
@@ -146,59 +145,50 @@ public class MusicPlayerActivity extends AppCompatActivity {
         playlist.next();
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
         intent.putExtra(EXTRA_CURRENT_PLAYLIST, playlist);
-        intent.putExtra(EXTRA_IS_MUSIC_PLAYING, Boolean.valueOf(isMusicServicePlaying()));
-        stopMusicPlayerService();
+        intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
         startActivity(intent);
         finish();
     }
 
-    private void startMusicPlayerService(String uri) {
-        MusicPlayerService.setCaller(this);
+    @Override
+    protected void onStart() {
+        super.onStart();
 
-        Intent intent = new Intent(
-                getApplicationContext(),
-                MusicPlayerService.class
-        );
-
-        intent.putExtra(EXTRA_URI, uri);
-        startService(intent);
-    }
-
-    private void stopMusicPlayerService() {
-        Intent intent = new Intent(
-                getApplicationContext(),
-                MusicPlayerService.class
-        );
-
-        stopService(intent);
-    }
-
-    public void onMusicFinished() {
-        startNextMusic();
-    }
-
-    private boolean isMusicServicePlaying() {
-        return isServicePlaying(MusicPlayerService.class);
-    }
-
-    private boolean isServicePlaying(Class<?> serviceClass) {
-        ActivityManager manager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-        for (ActivityManager.RunningServiceInfo service : manager.getRunningServices(Integer.MAX_VALUE)) {
-            if (serviceClass.getName().equals(service.service.getClassName())) {
-                return true;
+        connection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                MusicPlayerService.MusicPlayerServiceBinder binder = (MusicPlayerService.MusicPlayerServiceBinder) service;
+                musicPlayerService = binder.getService();
+                musicPlayerService.setCaller(MusicPlayerActivity.this);
+                musicPlayerService.setMusic(music.getUri(), shouldPlay);
             }
-        }
-        return false;
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+
+            }
+        };
+
+        Intent intent = new Intent(this, MusicPlayerService.class);
+        bindService(intent, connection, Context.BIND_AUTO_CREATE);
+
+        Toast.makeText(getApplicationContext(), String.valueOf(shouldPlay), Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    protected void onStop() {
+        unbindService(connection);
+        Toast.makeText(getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
+        super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        Intent intent = new Intent(
-                MusicPlayerActivity.this,
-                MusicPlayerService.class
-        );
-        stopService(intent);
-
+        Toast.makeText(getApplicationContext(), "destroy", Toast.LENGTH_SHORT).show();
         super.onDestroy();
+    }
+
+    public void onMusicFinished() {
+        startNextMusic();
     }
 }
