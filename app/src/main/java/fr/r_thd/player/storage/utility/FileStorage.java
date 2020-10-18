@@ -65,4 +65,8 @@ public abstract class FileStorage<T> implements Storage<T> {
             return false;
         }
     }
+
+    protected Context getContext() {
+        return context;
+    }
 }

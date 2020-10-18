@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Random;
 
 /**
@@ -50,12 +51,20 @@ public class Playlist implements Serializable {
      * @param name Nom de la playlist
      */
     public Playlist(@NonNull String name) {
+        this(GLOBAL_ID, name);
+        GLOBAL_ID ++;
+    }
+
+    public Playlist(int id, @NonNull String name) {
         this.content = new ArrayList<>();
         this.indexes = new ArrayList<>();
         this.currentIndex = 0;
         this.name = name;
-        this.id = GLOBAL_ID;
-        GLOBAL_ID ++;
+        this.id = id;
+
+        if (id >= GLOBAL_ID) {
+            GLOBAL_ID = id + 1;
+        }
     }
 
     /**
@@ -109,6 +118,10 @@ public class Playlist implements Serializable {
         i = (i + size()) % size();
         int index = indexes.get(i);
         return content.get(index);
+    }
+
+    public List<Music> getArray() {
+        return content;
     }
 
     public Music previous() {
