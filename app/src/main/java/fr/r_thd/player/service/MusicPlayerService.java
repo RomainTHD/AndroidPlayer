@@ -6,8 +6,10 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
 import android.os.IBinder;
+import android.util.Log;
 import android.widget.Toast;
 
+import java.io.File;
 import java.io.IOException;
 
 import fr.r_thd.player.activity.MusicPlayerActivity;
@@ -100,13 +102,12 @@ public class MusicPlayerService extends Service implements
         return START_STICKY;
     }
 
-    public void setMusic(String uriStr, final Boolean shouldPlay) {
+    public void setMusic(String path, final Boolean shouldPlay) {
         musicPlayer.reset();
         pos = 0;
 
         try {
-            Uri uri = Uri.parse(uriStr);
-            musicPlayer.setDataSource(this, uri);
+            musicPlayer.setDataSource(path);
             musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -133,8 +134,6 @@ public class MusicPlayerService extends Service implements
             musicPlayer.stop();
         }
 
-        Toast.makeText(getApplicationContext(), "destroy", Toast.LENGTH_SHORT).show();
-
         isRunning = false;
         super.onDestroy();
     }
@@ -146,7 +145,6 @@ public class MusicPlayerService extends Service implements
 
     @Override
     public void onTaskRemoved(Intent rootIntent) {
-        Toast.makeText(getApplicationContext(), "removed", Toast.LENGTH_SHORT).show();
         // super.onTaskRemoved(rootIntent);
         stopSelf();
     }

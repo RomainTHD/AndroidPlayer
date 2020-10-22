@@ -27,9 +27,9 @@ public interface Storage<T> {
      * Insère un élément
      *
      * @param elem Élément
-     * @return Inséré ou non
+     * @return Id de l'élément
      */
-    boolean insert(T elem);
+    int insert(T elem);
 
     /**
      * Update un élément

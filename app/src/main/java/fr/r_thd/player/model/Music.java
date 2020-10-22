@@ -8,7 +8,17 @@ import java.io.Serializable;
 /**
  * Musique
  */
-public class Music implements Serializable {
+public class Music {
+    /**
+     * ID
+     */
+    private int id;
+
+    /**
+     * ID de la playlist
+     */
+    private int playlistId;
+
     /**
      * Titre
      */
@@ -19,7 +29,11 @@ public class Music implements Serializable {
      * URI
      */
     @NonNull
-    private String uri;
+    private final String uri;
+
+    public Music(int playlistId, @NonNull String title, @NonNull String uri) {
+        this(-1, playlistId, title, uri);
+    }
 
     /**
      * Constructeur
@@ -27,12 +41,23 @@ public class Music implements Serializable {
      * @param title Titre
      * @param uri URI
      */
-    public Music(@NonNull String title, @Nullable String uri) {
+    public Music(int id, int playlistId, @NonNull String title, @NonNull String uri) {
+        this.id = id;
+        this.playlistId = playlistId;
         this.title = title;
-
-        // TODO: Mettre en not null
-
         this.uri = uri;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getPlaylistId() {
+        return playlistId;
     }
 
     /**

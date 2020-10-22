@@ -8,6 +8,8 @@ import android.provider.OpenableColumns;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.io.File;
+
 /**
  * Utility d'URI
  */
@@ -47,5 +49,12 @@ public abstract class UriUtility {
         }
 
         return result;
+    }
+
+    @NonNull
+    public static String getPath(@NonNull Uri uri) {
+        File file = new File(uri.getPath());//create path from uri
+        final String[] split = file.getPath().split(":");//split the path.
+        return split[1];
     }
 }

@@ -1,5 +1,7 @@
 package fr.r_thd.player.model;
 
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 
 import java.io.Serializable;
@@ -7,15 +9,22 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import fr.r_thd.player.activity.PlaylistActivity;
+
 /**
  * Playlist de musiques
  */
-public class Playlist implements Serializable {
+public class Playlist {
     /**
-     * ID globaux
-     * TODO: remplacer par LAST_ID ?
+     * ID de la playlist
      */
-    private static int GLOBAL_ID = 1;
+    private int id;
+
+    /**
+     * Titre
+     */
+    @NonNull
+    private String name;
 
     /**
      * Contenu, musiques
@@ -27,44 +36,33 @@ public class Playlist implements Serializable {
      * Indexes, ordre des musiques
      */
     @NonNull
-    private ArrayList<Integer> indexes;
-
-    /**
-     * ID de la playlist
-     */
-    private int id;
+    private transient ArrayList<Integer> indexes;
 
     /**
      * Index de lecture courant
      */
-    private int currentIndex;
+    private transient int currentIndex;
 
-    /**
-     * Titre
-     */
-    @NonNull
-    private String name;
-
-    /**
-     * Constructeur
-     *
-     * @param name Nom de la playlist
-     */
     public Playlist(@NonNull String name) {
-        this(GLOBAL_ID, name);
-        GLOBAL_ID ++;
+        this(-1, name, new ArrayList<Music>());
     }
 
-    public Playlist(int id, @NonNull String name) {
+    public Playlist(int id, @NonNull String name, List<Music> musicList) {
         this.content = new ArrayList<>();
         this.indexes = new ArrayList<>();
         this.currentIndex = 0;
         this.name = name;
         this.id = id;
 
-        if (id >= GLOBAL_ID) {
-            GLOBAL_ID = id + 1;
+        for (Music music : musicList) {
+            if (music.getPlaylistId() == id) {
+                add(music);
+            }
         }
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 
     /**
@@ -115,7 +113,9 @@ public class Playlist implements Serializable {
     }
 
     public Music get(int i) {
-        i = (i + size()) % size();
+        if (size() != 0) {
+            i = (i + size()) % size();
+        }
         int index = indexes.get(i);
         return content.get(index);
     }

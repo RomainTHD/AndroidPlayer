@@ -21,28 +21,10 @@ import fr.r_thd.player.adapter.PlaylistAdapter;
 import fr.r_thd.player.model.Music;
 import fr.r_thd.player.model.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
+import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
 public class HomeActivity extends AppCompatActivity {
-    private static List<Playlist> playlistList = new ArrayList<>();
-
-    static {
-        Playlist p1 = new Playlist("Ma playlist");
-        p1.add(new Music("test", null));
-        p1.add(new Music("test2", null));
-
-        Playlist p2 = new Playlist("Autre playlist");
-        p2.add(new Music("test3", null));
-        p2.add(new Music("test4", null));
-        p2.add(new Music("test5", null));
-
-        Playlist p3 = new Playlist("Playlist 3");
-
-        playlistList.add(p1);
-        playlistList.add(p2);
-        playlistList.add(p3);
-    }
-
-    public static final String EXTRA_DETAILS_PLAYLIST = "EXTRA_DETAILS_PLAYLIST";
+    public static final String EXTRA_DETAILS_PLAYLIST_ID = "EXTRA_DETAILS_PLAYLIST_ID";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +39,8 @@ public class HomeActivity extends AppCompatActivity {
             startService(intent);
         }
 
+        final List<Playlist> playlistList = PlaylistDatabaseStorage.get(getApplicationContext()).findAll();
+
         setContentView(R.layout.activity_home);
 
         final RecyclerView list = findViewById(R.id.playlist_list);
@@ -67,7 +51,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onItemClick(View v) {
                 Playlist playlist = playlistList.get(list.getChildViewHolder(v).getAdapterPosition());
                 Intent intent = new Intent(getApplicationContext(), PlaylistActivity.class);
-                intent.putExtra(EXTRA_DETAILS_PLAYLIST, playlist);
+                intent.putExtra(EXTRA_DETAILS_PLAYLIST_ID, playlist.getId());
                 startActivity(intent);
             }
 
@@ -125,8 +109,14 @@ public class HomeActivity extends AppCompatActivity {
                         String name = input.getText().toString().trim();
 
                         if (!name.isEmpty()) {
-                            playlistList.add(new Playlist(name));
-                            playlistAdapter.notifyDataSetChanged();
+                            Playlist playlist = new Playlist(name);
+                            int id = PlaylistDatabaseStorage.get(getApplicationContext()).insert(playlist);
+
+                            if (id != -1) {
+                                playlist.setId(id);
+                                playlistList.add(playlist);
+                                playlistAdapter.notifyDataSetChanged();
+                            }
                         }
                     }
                 });

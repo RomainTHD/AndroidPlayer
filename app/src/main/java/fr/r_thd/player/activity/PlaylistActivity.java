@@ -11,44 +11,57 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.MusicAdapter;
 import fr.r_thd.player.model.Music;
 import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.storage.MusicDatabaseStorage;
+import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 import fr.r_thd.player.util.UriUtility;
 
 public class PlaylistActivity extends AppCompatActivity {
     private static final int REQUEST_GET_FILE = 0;
 
-    private Playlist playlist;
-    private MusicAdapter listAdaper;
+    private static Playlist playlist;
+    private MusicAdapter listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_playlist);
 
-        playlist = (Playlist) getIntent().getSerializableExtra(HomeActivity.EXTRA_DETAILS_PLAYLIST);
+        int id = getIntent().getIntExtra(HomeActivity.EXTRA_DETAILS_PLAYLIST_ID, -1);
+
+        if (id == -1) {
+            Toast.makeText(getApplicationContext(), "ID nul", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        playlist = PlaylistDatabaseStorage.get(getApplicationContext()).find(id);
 
         if (playlist == null) {
             Toast.makeText(getApplicationContext(), "Playlist nulle", Toast.LENGTH_LONG).show();
             return;
         }
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         final RecyclerView list = findViewById(R.id.playlist);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        listAdaper = new MusicAdapter(playlist) {
+        listAdapter = new MusicAdapter(playlist) {
             @Override
             public void onItemClick(View v) {
                 playlist.setCurrentIndex(list.getChildViewHolder(v).getAdapterPosition());
                 Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-                intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST, playlist);
+                intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
                 startActivity(intent);
             }
 
@@ -85,7 +98,7 @@ public class PlaylistActivity extends AppCompatActivity {
                 return true;
             }
         };
-        list.setAdapter(listAdaper);
+        list.setAdapter(listAdapter);
 
         findViewById(R.id.button_shuffle).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -97,7 +110,7 @@ public class PlaylistActivity extends AppCompatActivity {
                     playlist.shuffle();
                     playlist.setCurrentIndex(0);
                     Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-                    intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST, playlist);
+                    intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
                     startActivity(intent);
                 }
             }
@@ -133,8 +146,19 @@ public class PlaylistActivity extends AppCompatActivity {
 
                 if (fileUri != null) {
                     String name = UriUtility.getFileName(fileUri, getContentResolver());
-                    playlist.add(new Music(name, fileUri.toString()));
-                    listAdaper.notifyDataSetChanged();
+                    String path = UriUtility.getPath(fileUri);
+
+                    Music music = new Music(playlist.getId(), name, path);
+                    int id = MusicDatabaseStorage.get(getApplicationContext()).insert(music);
+
+                    if (id == -1) {
+                        Toast.makeText(getApplicationContext(), "Erreur", Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        music.setId(id);
+                        playlist.add(music);
+                        listAdapter.notifyDataSetChanged();
+                    }
                 }
             }
         }

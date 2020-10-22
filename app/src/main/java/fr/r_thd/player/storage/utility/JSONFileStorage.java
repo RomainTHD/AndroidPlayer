@@ -71,21 +71,20 @@ public abstract class JSONFileStorage<T> extends FileStorage<T> {
     }
 
     @Override
-    public boolean insert(T elem) {
+    public int insert(T elem) {
         int nextId = json.optInt(NEXT_ID);
-        boolean ok = false;
 
         try {
             json.getJSONObject(LIST).put(String.valueOf(nextId), objectToJsonObject(nextId, elem));
             json.put(NEXT_ID, nextId + 1);
-            ok = true;
+            write();
         }
         catch (JSONException e) {
             e.printStackTrace();
+            nextId = -1;
         }
 
-        write();
-        return ok;
+        return nextId;
     }
 
     @Override

@@ -17,13 +17,17 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+import java.util.List;
+
 import fr.r_thd.player.R;
 import fr.r_thd.player.model.Music;
 import fr.r_thd.player.model.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
+import fr.r_thd.player.storage.MusicDatabaseStorage;
+import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
 public class MusicPlayerActivity extends AppCompatActivity {
-    public static final String EXTRA_CURRENT_PLAYLIST = "EXTRA_CURRENT_PLAYLIST";
+    public static final String EXTRA_CURRENT_PLAYLIST_ID = "EXTRA_CURRENT_PLAYLIST";
     public static final String EXTRA_SHOULD_PLAY =  "EXTRA_SHOULD_PLAY";
 
     private Playlist playlist;
@@ -40,8 +44,14 @@ public class MusicPlayerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_music_player);
 
-        playlist = (Playlist) getIntent()
-                .getSerializableExtra(EXTRA_CURRENT_PLAYLIST);
+        int id = getIntent().getIntExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, -1);
+
+        if (id == -1) {
+            Toast.makeText(getApplicationContext(), "ID nul", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        playlist = PlaylistDatabaseStorage.get(getApplicationContext()).find(id);
 
         if (playlist == null) {
             Toast.makeText(getApplicationContext(), "Playlist nulle", Toast.LENGTH_LONG).show();
@@ -135,7 +145,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private void startPreviousMusic() {
         playlist.previous();
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-        intent.putExtra(EXTRA_CURRENT_PLAYLIST, playlist);
+        intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
         intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
         startActivity(intent);
         finish();
@@ -144,7 +154,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private void startNextMusic() {
         playlist.next();
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-        intent.putExtra(EXTRA_CURRENT_PLAYLIST, playlist);
+        intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
         intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
         startActivity(intent);
         finish();
@@ -178,13 +188,13 @@ public class MusicPlayerActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         unbindService(connection);
-        Toast.makeText(getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        Toast.makeText(getApplicationContext(), "destroy", Toast.LENGTH_SHORT).show();
+        // Toast.makeText(getApplicationContext(), "destroy", Toast.LENGTH_SHORT).show();
         super.onDestroy();
     }
 
