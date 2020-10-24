@@ -5,11 +5,13 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
+import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 import fr.r_thd.player.activity.MusicPlayerActivity;
@@ -23,6 +25,8 @@ public class MusicPlayerService extends Service implements
     private static boolean isRunning = false;
 
     private static boolean isPlaying = false;
+
+    private static String currentPath;
 
     public static boolean isRunning() {
         return isRunning;
@@ -80,6 +84,7 @@ public class MusicPlayerService extends Service implements
         super.onCreate();
         isRunning = true;
         isPlaying = false;
+        currentPath = null;
 
         musicPlayer = new MediaPlayer();
         musicPlayer.setLooping(false);
@@ -102,12 +107,25 @@ public class MusicPlayerService extends Service implements
         return START_STICKY;
     }
 
-    public void setMusic(String path, final Boolean shouldPlay) {
+    public void setMusic(String uriStr, final Boolean shouldPlay) {
+        String path = Environment.getExternalStorageDirectory().getPath() + "/" + uriStr;
+
+        if (path.equals(currentPath)) {
+            return;
+        }
+
+        currentPath = path;
+        Uri uri = Uri.parse(path);
+
+        if (musicPlayer.isPlaying()) {
+            musicPlayer.pause();
+        }
+
         musicPlayer.reset();
         pos = 0;
 
         try {
-            musicPlayer.setDataSource(path);
+            musicPlayer.setDataSource(this, uri);
             musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -118,9 +136,9 @@ public class MusicPlayerService extends Service implements
                 }
             });
             musicPlayer.prepareAsync();
-            // musicPlayer.setOnCompletionListener(this);
+            musicPlayer.setOnCompletionListener(this);
         }
-        catch (IOException e) {
+        catch (Exception e) {
             Toast.makeText(this, "Erreur lors du chargement de la musique", Toast.LENGTH_SHORT).show();
         }
     }

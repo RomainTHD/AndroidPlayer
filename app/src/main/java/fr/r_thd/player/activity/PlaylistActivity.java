@@ -23,6 +23,7 @@ import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.MusicAdapter;
 import fr.r_thd.player.model.Music;
 import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.service.MusicPlayerService;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 import fr.r_thd.player.util.UriUtility;
@@ -59,9 +60,9 @@ public class PlaylistActivity extends AppCompatActivity {
         listAdapter = new MusicAdapter(playlist) {
             @Override
             public void onItemClick(View v) {
-                playlist.setCurrentIndex(list.getChildViewHolder(v).getAdapterPosition());
                 Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
                 intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
+                intent.putExtra(MusicPlayerActivity.EXTRA_SELECTED_MUSIC_INDEX, list.getChildViewHolder(v).getAdapterPosition());
                 startActivity(intent);
             }
 
@@ -111,6 +112,8 @@ public class PlaylistActivity extends AppCompatActivity {
                     playlist.setCurrentIndex(0);
                     Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
                     intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
+                    intent.putExtra(MusicPlayerActivity.EXTRA_SELECTED_MUSIC_INDEX, playlist.getRandomIndex());
+                    intent.putExtra(MusicPlayerActivity.EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
                     startActivity(intent);
                 }
             }

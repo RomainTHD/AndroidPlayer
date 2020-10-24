@@ -28,6 +28,7 @@ import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
 public class MusicPlayerActivity extends AppCompatActivity {
     public static final String EXTRA_CURRENT_PLAYLIST_ID = "EXTRA_CURRENT_PLAYLIST";
+    public static final String EXTRA_SELECTED_MUSIC_INDEX = "EXTRA_SELECTED_MUSIC_INDEX";
     public static final String EXTRA_SHOULD_PLAY =  "EXTRA_SHOULD_PLAY";
 
     private Playlist playlist;
@@ -46,7 +47,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         int id = getIntent().getIntExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, -1);
 
-        if (id == -1) {
+        int musicIndex = getIntent().getIntExtra(MusicPlayerActivity.EXTRA_SELECTED_MUSIC_INDEX, -1);
+
+        if (id == -1 || musicIndex == -1) {
             Toast.makeText(getApplicationContext(), "ID nul", Toast.LENGTH_LONG).show();
             return;
         }
@@ -57,6 +60,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Playlist nulle", Toast.LENGTH_LONG).show();
             return;
         }
+
+        playlist.setCurrentIndex(musicIndex);
 
         music = playlist.get();
 
@@ -89,6 +94,10 @@ public class MusicPlayerActivity extends AppCompatActivity {
         ////////////////////////////////////////////////////////////////////////////////////////////
 
         ((TextView) findViewById(R.id.music_title)).setText(music.getTitle());
+
+        ((TextView) findViewById(R.id.title_next)).setText(playlist.getNext().getTitle());
+
+        ((TextView) findViewById(R.id.title_previous)).setText(playlist.getPrevious().getTitle());
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -143,18 +152,18 @@ public class MusicPlayerActivity extends AppCompatActivity {
     }
 
     private void startPreviousMusic() {
-        playlist.previous();
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
         intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
+        intent.putExtra(EXTRA_SELECTED_MUSIC_INDEX, playlist.getPreviousIndex());
         intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
         startActivity(intent);
         finish();
     }
 
     private void startNextMusic() {
-        playlist.next();
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
         intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
+        intent.putExtra(EXTRA_SELECTED_MUSIC_INDEX, playlist.getNextIndex());
         intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
         startActivity(intent);
         finish();
@@ -181,20 +190,16 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         Intent intent = new Intent(this, MusicPlayerService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
-
-        Toast.makeText(getApplicationContext(), String.valueOf(shouldPlay), Toast.LENGTH_SHORT).show();
     }
 
     @Override
     protected void onStop() {
         unbindService(connection);
-        // Toast.makeText(getApplicationContext(), "stop", Toast.LENGTH_SHORT).show();
         super.onStop();
     }
 
     @Override
     protected void onDestroy() {
-        // Toast.makeText(getApplicationContext(), "destroy", Toast.LENGTH_SHORT).show();
         super.onDestroy();
     }
 

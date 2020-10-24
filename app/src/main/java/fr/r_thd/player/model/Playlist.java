@@ -138,8 +138,22 @@ public class Playlist {
         return get(currentIndex - 1);
     }
 
+    public int getPreviousIndex() {
+        return indexes.get((currentIndex + size() - 1) % size());
+    }
+
     public Music getNext() {
         return get(currentIndex + 1);
+    }
+
+    public int getNextIndex() {
+        return indexes.get((currentIndex + 1) % size());
+    }
+
+    public int getRandomIndex() {
+        Random r = new Random();
+        int i = r.nextInt(size());
+        return indexes.get(i);
     }
 
     public void shuffle() {
