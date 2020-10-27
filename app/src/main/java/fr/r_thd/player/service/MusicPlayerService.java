@@ -1,7 +1,9 @@
 package fr.r_thd.player.service;
 
+import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
@@ -9,6 +11,8 @@ import android.os.Environment;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,7 +112,16 @@ public class MusicPlayerService extends Service implements
     }
 
     public void setMusic(String uriStr, final Boolean shouldPlay) {
-        String path = Environment.getExternalStorageDirectory().getPath() + "/" + uriStr;
+        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            caller.requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, MusicPlayerActivity.REQUEST_EXTERNAL_STORAGE);
+        }
+
+        String externalDirectory = Environment.getExternalStorageDirectory().getPath();
+        String path = uriStr;
+
+        if (!uriStr.startsWith(externalDirectory)) {
+            path = externalDirectory + "/" + uriStr;
+        }
 
         if (path.equals(currentPath)) {
             return;
@@ -119,6 +132,7 @@ public class MusicPlayerService extends Service implements
 
         if (musicPlayer.isPlaying()) {
             musicPlayer.pause();
+            musicPlayer.stop();
         }
 
         musicPlayer.reset();

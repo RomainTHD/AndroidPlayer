@@ -1,5 +1,6 @@
 package fr.r_thd.player.activity;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.app.ActivityManager;
@@ -7,6 +8,7 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.PackageManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.IBinder;
@@ -30,6 +32,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
     public static final String EXTRA_CURRENT_PLAYLIST_ID = "EXTRA_CURRENT_PLAYLIST";
     public static final String EXTRA_SELECTED_MUSIC_INDEX = "EXTRA_SELECTED_MUSIC_INDEX";
     public static final String EXTRA_SHOULD_PLAY =  "EXTRA_SHOULD_PLAY";
+
+    public static final int REQUEST_EXTERNAL_STORAGE = 12345;
 
     private Playlist playlist;
     private Music music;
@@ -205,5 +209,14 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
     public void onMusicFinished() {
         startNextMusic();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode == REQUEST_EXTERNAL_STORAGE) {
+            if (grantResults.length == 0 || grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(getApplicationContext(), "Cette application nécessite des permissions pour continuer", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 }
