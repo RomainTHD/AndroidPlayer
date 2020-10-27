@@ -35,19 +35,10 @@
     </LinearLayout>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/button_remove"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
-        android:tint="@android:color/white"
-        android:src="@drawable/ic_remove" />
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_shuffle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_gravity="bottom|center"
+        android:layout_gravity="bottom|start"
         android:layout_margin="16dp"
         android:tint="@android:color/white"
         android:src="@drawable/ic_shuffle" />

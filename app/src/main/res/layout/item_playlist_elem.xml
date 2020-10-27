@@ -33,5 +33,13 @@
             android:padding="10dp"
             android:layout_weight="1.5"
             android:src="@drawable/ic_edit" />
+
+        <ImageView
+            android:id="@+id/item_delete_button"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="10dp"
+            android:layout_weight="1.5"
+            android:src="@drawable/ic_delete" />
     </LinearLayout>
 </LinearLayout>
