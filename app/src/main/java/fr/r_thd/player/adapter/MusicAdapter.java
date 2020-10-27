@@ -1,5 +1,7 @@
 package fr.r_thd.player.adapter;
 
+import android.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,12 +12,15 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import fr.r_thd.player.R;
+import fr.r_thd.player.activity.PlaylistActivity;
+import fr.r_thd.player.dialog.MusicEditDialog;
+import fr.r_thd.player.dialog.UpdatableFromDialog;
 import fr.r_thd.player.model.Playlist;
 
 /**
  * Adapter de musique
  */
-public abstract class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder> {
+public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder> {
     /**
      * Holder de view
      */
@@ -28,17 +33,50 @@ public abstract class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Mus
         /**
          * Titre
          */
-        private TextView title;
+        private final TextView title;
+
+        private ImageView editButton;
+
+        private ImageView deleteButton;
 
         /**
          * Constructeur
          *
          * @param itemView Item
          */
-        public MusicHolder(@NonNull View itemView) {
+        public MusicHolder(@NonNull View itemView, final MusicAdapterListener listener) {
             super(itemView);
             preview = itemView.findViewById(R.id.item_preview);
+            preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(getAdapterPosition());
+                }
+            });
+
             title = itemView.findViewById(R.id.item_title);
+            title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(getAdapterPosition());
+                }
+            });
+
+            editButton = itemView.findViewById(R.id.item_edit_button);
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onEditButtonClick(getAdapterPosition());
+                }
+            });
+
+            deleteButton = itemView.findViewById(R.id.item_delete_button);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onDeleteButtonClick(getAdapterPosition());
+                }
+            });
         }
 
         public ImageView getPreview() {
@@ -53,53 +91,39 @@ public abstract class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.Mus
     /**
      * Playlist associée
      */
-    private Playlist playlist;
+    private final Playlist playlist;
 
-    public MusicAdapter(Playlist playlist) {
+    private final MusicAdapterListener listener;
+
+    public MusicAdapter(Playlist playlist, MusicAdapterListener listener) {
         this.playlist = playlist;
+        this.listener = listener;
     }
 
     @NonNull
     @Override
     public MusicAdapter.MusicHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext())
+        final View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_playlist_elem, parent, false);
-
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                MusicAdapter.this.onItemClick(v);
-            }
-        });
 
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return MusicAdapter.this.onItemLongClick(v);
+                listener.onLongClick();
+                return true;
             }
         });
 
-        return new MusicAdapter.MusicHolder(view);
+        return new MusicAdapter.MusicHolder(view, listener);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull MusicAdapter.MusicHolder holder, int position) {
+    public void onBindViewHolder(@NonNull MusicAdapter.MusicHolder holder, final int position) {
         holder.title.setText(playlist.get(position).getTitle());
-        // TODO:
     }
 
     @Override
     public int getItemCount() {
         return playlist.size();
     }
-
-    /**
-     * On item click
-     */
-    public abstract void onItemClick(View v);
-
-    /**
-     * On item long click
-     */
-    public abstract boolean onItemLongClick(View v);
 }

@@ -2,6 +2,7 @@ package fr.r_thd.player.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -14,6 +15,8 @@ import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -21,6 +24,10 @@ import java.util.List;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.MusicAdapter;
+import fr.r_thd.player.adapter.MusicAdapterListener;
+import fr.r_thd.player.dialog.MusicDeleteDialog;
+import fr.r_thd.player.dialog.MusicEditDialog;
+import fr.r_thd.player.dialog.UpdatableFromDialog;
 import fr.r_thd.player.model.Music;
 import fr.r_thd.player.model.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
@@ -28,7 +35,7 @@ import fr.r_thd.player.storage.MusicDatabaseStorage;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 import fr.r_thd.player.util.UriUtility;
 
-public class PlaylistActivity extends AppCompatActivity {
+public class PlaylistActivity extends AppCompatActivity implements UpdatableFromDialog {
     private static final int REQUEST_GET_FILE = 0;
 
     private static Playlist playlist;
@@ -57,48 +64,30 @@ public class PlaylistActivity extends AppCompatActivity {
 
         final RecyclerView list = findViewById(R.id.playlist);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        listAdapter = new MusicAdapter(playlist) {
+        listAdapter = new MusicAdapter(playlist, new MusicAdapterListener() {
             @Override
-            public void onItemClick(View v) {
+            public void onLongClick() {
+                Toast.makeText(getApplicationContext(), "Détails d'un élément", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onClick(int pos) {
                 Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
                 intent.putExtra(MusicPlayerActivity.EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
-                intent.putExtra(MusicPlayerActivity.EXTRA_SELECTED_MUSIC_INDEX, list.getChildViewHolder(v).getAdapterPosition());
+                intent.putExtra(MusicPlayerActivity.EXTRA_SELECTED_MUSIC_INDEX, pos);
                 startActivity(intent);
             }
 
             @Override
-            public boolean onItemLongClick(final View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(PlaylistActivity.this);
-                builder.setTitle("Modifier le titre");
-
-                final EditText input = new EditText(PlaylistActivity.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
-                input.setHint("Titre de la musique");
-                builder.setView(input);
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String title = input.getText().toString().trim();
-
-                        if (!title.isEmpty()) {
-                            playlist.get(list.getChildViewHolder(v).getAdapterPosition()).setTitle(title);
-                            notifyDataSetChanged();
-                        }
-                    }
-                });
-
-                builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-                return true;
+            public void onEditButtonClick(int pos) {
+                new MusicEditDialog(PlaylistActivity.this, playlist.get(pos)).show(getSupportFragmentManager(), "");
             }
-        };
+
+            @Override
+            public void onDeleteButtonClick(int pos) {
+                new MusicDeleteDialog(PlaylistActivity.this, playlist, pos).show(getSupportFragmentManager(), "");
+            }
+        });
         list.setAdapter(listAdapter);
 
         findViewById(R.id.button_shuffle).setOnClickListener(new View.OnClickListener() {
@@ -165,5 +154,10 @@ public class PlaylistActivity extends AppCompatActivity {
                 }
             }
         }
+    }
+
+    @Override
+    public void updateFromDialog() {
+        listAdapter.notifyDataSetChanged();
     }
 }
