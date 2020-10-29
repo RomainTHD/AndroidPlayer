@@ -3,14 +3,15 @@ package fr.r_thd.player.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.app.ActivityManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
+import android.database.ContentObserver;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
 import android.widget.SeekBar;
@@ -19,13 +20,10 @@ import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.util.List;
-
 import fr.r_thd.player.R;
-import fr.r_thd.player.model.Music;
-import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.objects.Music;
+import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
-import fr.r_thd.player.storage.MusicDatabaseStorage;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
 public class MusicPlayerActivity extends AppCompatActivity {
@@ -41,6 +39,8 @@ public class MusicPlayerActivity extends AppCompatActivity {
     private MusicPlayerService musicPlayerService;
 
     private ServiceConnection connection;
+
+    private ContentObserver volumeObserver;
 
     private boolean shouldPlay;
 
@@ -73,7 +73,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
-        SeekBar volumeSeekBar = findViewById(R.id.volume_seek_bar);
+        final SeekBar volumeSeekBar = findViewById(R.id.volume_seek_bar);
         final AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         volumeSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         volumeSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
@@ -94,6 +94,16 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
             }
         });
+
+        volumeObserver = new ContentObserver(new Handler()) {
+            @Override
+            public void onChange(boolean selfChange) {
+                super.onChange(selfChange);
+                volumeSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
+            }
+        };
+
+        getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, volumeObserver);
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -199,6 +209,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
     @Override
     protected void onStop() {
         unbindService(connection);
+        getApplicationContext().getContentResolver().unregisterContentObserver(volumeObserver);
         super.onStop();
     }
 
