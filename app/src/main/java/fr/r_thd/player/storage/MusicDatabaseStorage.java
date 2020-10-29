@@ -6,10 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import android.util.Log;
 import android.util.Pair;
 
-import fr.r_thd.player.model.Music;
+import fr.r_thd.player.objects.Music;
 import fr.r_thd.player.storage.utility.DatabaseStorage;
 
 public class MusicDatabaseStorage extends DatabaseStorage<Music> {

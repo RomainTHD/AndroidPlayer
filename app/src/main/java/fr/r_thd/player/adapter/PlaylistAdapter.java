@@ -13,7 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.List;
 
-import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.objects.Playlist;
 
 public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> {
     static class PlaylistHolder extends RecyclerView.ViewHolder {
@@ -35,7 +35,7 @@ public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapt
         }
     }
 
-    private List<Playlist> playlistList;
+    private final List<Playlist> playlistList;
 
     public PlaylistAdapter(List<Playlist> playlistList) {
         this.playlistList = playlistList;

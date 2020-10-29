@@ -1,15 +1,10 @@
-package fr.r_thd.player.model;
-
-import android.widget.Toast;
+package fr.r_thd.player.objects;
 
 import androidx.annotation.NonNull;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
-
-import fr.r_thd.player.activity.PlaylistActivity;
 
 /**
  * Playlist de musiques

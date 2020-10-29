@@ -13,13 +13,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.PlaylistAdapter;
-import fr.r_thd.player.model.Music;
-import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 

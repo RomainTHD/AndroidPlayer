@@ -8,7 +8,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
 import android.util.Pair;
 
-import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.utility.DatabaseStorage;
 
 public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
