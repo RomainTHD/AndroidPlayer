@@ -139,7 +139,7 @@ public class MusicPlayerService extends Service implements
         pos = 0;
 
         try {
-            musicPlayer.setDataSource(this, uri);
+            musicPlayer.setDataSource(getApplicationContext(), uri);
             musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {

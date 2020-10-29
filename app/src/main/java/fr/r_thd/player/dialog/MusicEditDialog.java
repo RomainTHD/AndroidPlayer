@@ -12,17 +12,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import fr.r_thd.player.R;
-import fr.r_thd.player.model.Music;
+import fr.r_thd.player.objects.Music;
+import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
 
 public class MusicEditDialog extends DialogFragment {
-    private UpdatableFromDialog updatable;
+    private final UpdatableFromDialog updatable;
+    private final int pos;
     private Music edited;
     private View view;
 
-    public MusicEditDialog(UpdatableFromDialog updatable, Music edited) {
+    public MusicEditDialog(UpdatableFromDialog updatable, Playlist playlist, int pos) {
         this.updatable = updatable;
-        this.edited = edited;
+        this.pos = pos;
+        this.edited = playlist.get(pos);
     }
 
     @NonNull
@@ -38,7 +41,7 @@ public class MusicEditDialog extends DialogFragment {
                     public void onClick(DialogInterface dialog, int which) {
                         Music music = getMusicFromView();
                         MusicDatabaseStorage.get(getContext()).update(music.getId(), music);
-                        updatable.updateFromDialog();
+                        updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.EDIT);
                     }
                 })
                 .setNegativeButton("Annuler", null)

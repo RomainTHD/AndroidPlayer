@@ -1,7 +1,5 @@
 package fr.r_thd.player.adapter;
 
-import android.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,10 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import fr.r_thd.player.R;
-import fr.r_thd.player.activity.PlaylistActivity;
-import fr.r_thd.player.dialog.MusicEditDialog;
-import fr.r_thd.player.dialog.UpdatableFromDialog;
-import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.objects.Playlist;
 
 /**
  * Adapter de musique
@@ -28,16 +23,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
         /**
          * Preview
          */
-        private ImageView preview;
+        private final ImageView preview;
 
         /**
          * Titre
          */
         private final TextView title;
-
-        private ImageView editButton;
-
-        private ImageView deleteButton;
 
         /**
          * Constructeur
@@ -62,7 +53,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
                 }
             });
 
-            editButton = itemView.findViewById(R.id.item_edit_button);
+            ImageView editButton = itemView.findViewById(R.id.item_edit_button);
             editButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -70,7 +61,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
                 }
             });
 
-            deleteButton = itemView.findViewById(R.id.item_delete_button);
+            ImageView deleteButton = itemView.findViewById(R.id.item_delete_button);
             deleteButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {

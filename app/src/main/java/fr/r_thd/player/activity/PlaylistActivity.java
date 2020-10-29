@@ -2,25 +2,14 @@ package fr.r_thd.player.activity;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.InputType;
-import android.util.Log;
 import android.view.View;
-import android.widget.EditText;
-import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.MusicAdapter;
@@ -28,8 +17,8 @@ import fr.r_thd.player.adapter.MusicAdapterListener;
 import fr.r_thd.player.dialog.MusicDeleteDialog;
 import fr.r_thd.player.dialog.MusicEditDialog;
 import fr.r_thd.player.dialog.UpdatableFromDialog;
-import fr.r_thd.player.model.Music;
-import fr.r_thd.player.model.Playlist;
+import fr.r_thd.player.objects.Music;
+import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
@@ -80,7 +69,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
             @Override
             public void onEditButtonClick(int pos) {
-                new MusicEditDialog(PlaylistActivity.this, playlist.get(pos)).show(getSupportFragmentManager(), "");
+                new MusicEditDialog(PlaylistActivity.this, playlist, pos).show(getSupportFragmentManager(), "");
             }
 
             @Override
@@ -157,7 +146,12 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
     }
 
     @Override
-    public void updateFromDialog() {
-        listAdapter.notifyDataSetChanged();
+    public void updateFromDialog(int pos, UpdatableFromDialog.UpdateType type) {
+        if (type == UpdateType.EDIT) {
+            listAdapter.notifyItemChanged(pos);
+        }
+        else if (type == UpdateType.DELETE) {
+            listAdapter.notifyItemRemoved(pos);
+        }
     }
 }

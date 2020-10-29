@@ -1,5 +1,9 @@
 package fr.r_thd.player.dialog;
 
 public interface UpdatableFromDialog {
-    void updateFromDialog();
+    enum UpdateType {
+        EDIT, DELETE
+    }
+
+    void updateFromDialog(int pos, UpdateType type);
 }
