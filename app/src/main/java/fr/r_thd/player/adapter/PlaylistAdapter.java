@@ -5,20 +5,23 @@ import fr.r_thd.player.R;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Filter;
+import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import fr.r_thd.player.objects.Playlist;
 
-public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> {
+public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> implements Filterable {
     static class PlaylistHolder extends RecyclerView.ViewHolder {
-        private ImageView preview;
-        private TextView title;
+        private final ImageView preview;
+        private final TextView title;
 
         public PlaylistHolder(@NonNull View itemView) {
             super(itemView);
@@ -35,10 +38,44 @@ public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapt
         }
     }
 
-    private final List<Playlist> playlistList;
+    private final List<Playlist> playlistListFull;
+
+    private List<Playlist> playlistListCurrent;
+
+    private final Filter filter;
 
     public PlaylistAdapter(List<Playlist> playlistList) {
-        this.playlistList = playlistList;
+        this.playlistListFull = new ArrayList<>(playlistList);
+        this.playlistListCurrent = playlistList;
+        this.filter = new Filter() {
+            @Override
+            protected FilterResults performFiltering(CharSequence constraint) {
+                List<Playlist> filteredList = new ArrayList<>();
+
+                if (constraint == null || constraint.length() == 0) {
+                    filteredList.addAll(playlistListFull);
+                }
+                else {
+                    String filterPattern = constraint.toString().toLowerCase().trim();
+                    for (Playlist playlist : playlistListFull) {
+                        if (playlist.getName().toLowerCase().contains(filterPattern)) {
+                            filteredList.add(playlist);
+                        }
+                    }
+                }
+
+                FilterResults results = new FilterResults();
+                results.values = filteredList;
+                return results;
+            }
+
+            @Override
+            protected void publishResults(CharSequence constraint, FilterResults results) {
+                playlistListCurrent.clear();
+                playlistListCurrent.addAll((List<Playlist>) results.values);
+                notifyDataSetChanged();
+            }
+        };
     }
 
     @NonNull
@@ -66,13 +103,17 @@ public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapt
 
     @Override
     public void onBindViewHolder(@NonNull PlaylistHolder holder, int position) {
-        holder.title.setText(playlistList.get(position).getName());
-        // TODO:
+        holder.title.setText(playlistListCurrent.get(position).getName());
     }
 
     @Override
     public int getItemCount() {
-        return playlistList.size();
+        return playlistListCurrent.size();
+    }
+
+    @Override
+    public Filter getFilter() {
+        return filter;
     }
 
     public abstract void onItemClick(View v);

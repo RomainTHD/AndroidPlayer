@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import fr.r_thd.player.R;
@@ -53,7 +54,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
         final RecyclerView list = findViewById(R.id.playlist);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        listAdapter = new MusicAdapter(playlist, new MusicAdapterListener() {
+        listAdapter = new MusicAdapter(playlist.getArray(), new MusicAdapterListener() {
             @Override
             public void onLongClick() {
                 Toast.makeText(getApplicationContext(), "Détails d'un élément", Toast.LENGTH_SHORT).show();
@@ -78,6 +79,8 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             }
         });
         list.setAdapter(listAdapter);
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         findViewById(R.id.button_shuffle).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -113,6 +116,22 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
                 intent.setType("*/*");
                 intent.setAction(Intent.ACTION_GET_CONTENT);
                 startActivityForResult(Intent.createChooser(intent, "Ajout d'une musique"), REQUEST_GET_FILE);
+            }
+        });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        SearchView searchView = findViewById(R.id.search_bar_music);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                listAdapter.getFilter().filter(newText);
+                return false;
             }
         });
     }

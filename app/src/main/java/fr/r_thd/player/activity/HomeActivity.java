@@ -9,8 +9,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.SearchView;
 import android.widget.Toast;
 
 import java.util.List;
@@ -28,6 +30,8 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         if (!MusicPlayerService.isRunning()) {
             Intent intent = new Intent(
                     getApplicationContext(),
@@ -36,6 +40,8 @@ public class HomeActivity extends AppCompatActivity {
 
             startService(intent);
         }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
 
         final List<Playlist> playlistList = PlaylistDatabaseStorage.get(getApplicationContext()).findAll();
 
@@ -90,6 +96,8 @@ public class HomeActivity extends AppCompatActivity {
 
         list.setAdapter(playlistAdapter);
 
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
         findViewById(R.id.button_create).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -135,6 +143,22 @@ public class HomeActivity extends AppCompatActivity {
             public boolean onLongClick(View v) {
                 Toast.makeText(getApplicationContext(), "Créer une playlist", Toast.LENGTH_SHORT).show();
                 return true;
+            }
+        });
+
+        ////////////////////////////////////////////////////////////////////////////////////////////
+
+        SearchView searchView = findViewById(R.id.search_bar_playlist);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                playlistAdapter.getFilter().filter(newText);
+                return false;
             }
         });
     }
