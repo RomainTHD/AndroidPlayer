@@ -26,24 +26,52 @@ import fr.r_thd.player.activity.MusicPlayerActivity;
 public class MusicPlayerService extends Service implements
         MediaPlayer.OnCompletionListener {
 
+    /**
+     * En train de tourner ou non
+     */
     private static boolean isRunning = false;
 
+    /**
+     * En train de jouer un son ou non
+     */
     private static boolean isPlaying = false;
 
+    /**
+     * Path de la musique actuelle
+     */
     private static String currentPath;
 
+    /**
+     * Getter
+     *
+     * @return En train de tourner ou non
+     */
     public static boolean isRunning() {
         return isRunning;
     }
 
+    /**
+     * Getter
+     *
+     * @return En train de jouer un son ou non
+     */
     public static boolean isPlaying() {
         return isPlaying;
     }
 
+    /**
+     * Binder
+     */
     private final IBinder binder = new MusicPlayerServiceBinder();
 
+    /**
+     * Caller
+     */
     private MusicPlayerActivity caller;
 
+    /**
+     * Timecode dans la musique
+     */
     private int pos = 0;
 
     /**
@@ -51,12 +79,25 @@ public class MusicPlayerService extends Service implements
      */
     private MediaPlayer musicPlayer;
 
+    /**
+     * Binder
+     */
     public class MusicPlayerServiceBinder extends Binder {
+        /**
+         * Récupération du service
+         *
+         * @return Service
+         */
         public MusicPlayerService getService() {
             return MusicPlayerService.this;
         }
     }
 
+    /**
+     * Set caller
+     *
+     * @param activity Activity
+     */
     public void setCaller(MusicPlayerActivity activity) {
         caller = activity;
     }
@@ -68,12 +109,18 @@ public class MusicPlayerService extends Service implements
         return binder;
     }
 
+    /**
+     * Pause
+     */
     public void pause() {
         musicPlayer.pause();
         pos = musicPlayer.getCurrentPosition();
         isPlaying = false;
     }
 
+    /**
+     * Play / unpause
+     */
     public void play() {
         musicPlayer.seekTo(pos);
         musicPlayer.start();
@@ -111,6 +158,12 @@ public class MusicPlayerService extends Service implements
         return START_STICKY;
     }
 
+    /**
+     * Set la musique
+     *
+     * @param uriStr URI
+     * @param shouldPlay Doit jouer ou non
+     */
     public void setMusic(String uriStr, final Boolean shouldPlay) {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
             caller.requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, MusicPlayerActivity.REQUEST_EXTERNAL_STORAGE);
@@ -170,11 +223,21 @@ public class MusicPlayerService extends Service implements
         super.onDestroy();
     }
 
+    /**
+     * Mediaplayer terminé
+     *
+     * @param mp Mediaplayer
+     */
     @Override
     public void onCompletion(MediaPlayer mp) {
         caller.onMusicFinished();
     }
 
+    /**
+     * Tâche retirée
+     *
+     * @param rootIntent Intention
+     */
     @Override
     public void onTaskRemoved(Intent rootIntent) {
         // super.onTaskRemoved(rootIntent);
