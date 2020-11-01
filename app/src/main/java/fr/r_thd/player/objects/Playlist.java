@@ -50,9 +50,7 @@ public class Playlist {
         this.id = id;
 
         for (Music music : musicList) {
-            if (music.getPlaylistId() == id) {
-                add(music);
-            }
+            add(music);
         }
     }
 

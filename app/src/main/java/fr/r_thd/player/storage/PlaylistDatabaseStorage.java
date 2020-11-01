@@ -6,7 +6,10 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
+import android.util.Log;
 import android.util.Pair;
+
+import java.util.List;
 
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.utility.DatabaseStorage;
@@ -65,10 +68,12 @@ public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
 
     @Override
     protected Playlist cursorToObject(Cursor cursor) {
+        int playlistId = cursor.getInt(COL_ID.second);
+
         return new Playlist(
-                cursor.getInt(COL_ID.second),
+                playlistId,
                 cursor.getString(COL_NAME.second),
-                MusicDatabaseStorage.get(context).findAll()
+                MusicDatabaseStorage.get(context).findAll(playlistId)
         );
     }
 }

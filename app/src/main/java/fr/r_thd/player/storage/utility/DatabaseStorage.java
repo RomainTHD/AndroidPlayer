@@ -10,8 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class DatabaseStorage<T> implements Storage<T> {
-    private final SQLiteOpenHelper helper;
-    private final String table;
+    protected final SQLiteOpenHelper helper;
+    protected final String table;
 
     public DatabaseStorage(SQLiteOpenHelper helper, String table) {
         this.helper = helper;
