@@ -12,13 +12,17 @@ import android.view.View;
 import android.widget.SearchView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.MusicAdapter;
-import fr.r_thd.player.adapter.MusicAdapterListener;
+import fr.r_thd.player.adapter.AdapterListener;
 import fr.r_thd.player.dialog.MusicDeleteDialog;
 import fr.r_thd.player.dialog.MusicEditDialog;
 import fr.r_thd.player.dialog.UpdatableFromDialog;
 import fr.r_thd.player.objects.Music;
+import fr.r_thd.player.objects.OnBitmapUpdateListener;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
@@ -54,7 +58,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
         final RecyclerView list = findViewById(R.id.playlist);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        listAdapter = new MusicAdapter(playlist.getArray(), new MusicAdapterListener() {
+        listAdapter = new MusicAdapter(playlist.getArray(), new AdapterListener() {
             @Override
             public void onLongClick() {
                 Toast.makeText(getApplicationContext(), "Détails d'un élément", Toast.LENGTH_SHORT).show();
@@ -75,7 +79,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
             @Override
             public void onDeleteButtonClick(int pos) {
-                new MusicDeleteDialog(PlaylistActivity.this, playlist, pos).show(getSupportFragmentManager(), "");
+                new MusicDeleteDialog(PlaylistActivity.this, playlist, listAdapter, pos).show(getSupportFragmentManager(), "");
             }
         });
         list.setAdapter(listAdapter);
@@ -113,8 +117,9 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             public void onClick(View v) {
                 Intent intent = new Intent();
                 intent.addCategory(Intent.CATEGORY_OPENABLE);
-                intent.setType("*/*");
-                intent.setAction(Intent.ACTION_GET_CONTENT);
+                intent.setType("audio/*");
+                intent.setAction(Intent.ACTION_OPEN_DOCUMENT);
+                intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true);
                 startActivityForResult(Intent.createChooser(intent, "Ajout d'une musique"), REQUEST_GET_FILE);
             }
         });
@@ -140,25 +145,45 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == REQUEST_GET_FILE && resultCode == RESULT_OK) {
-            if (data != null) {
-                Uri fileUri = data.getData();
+        if (requestCode == REQUEST_GET_FILE && resultCode == RESULT_OK && data != null) {
+            List<Uri> uris = new ArrayList<>();
 
-                if (fileUri != null) {
-                    String name = UriUtility.getFileName(fileUri, getContentResolver());
-                    String path = UriUtility.getPath(fileUri);
+            if(data.getClipData() != null) {
+                int count = data.getClipData().getItemCount();
+                int currentItem = 0;
+                while (currentItem < count) {
+                    uris.add(data.getClipData().getItemAt(currentItem).getUri());
+                    currentItem ++;
+                }
+            }
+            else if (data.getData() != null) {
+                uris.add(data.getData());
+            }
 
-                    Music music = new Music(playlist.getId(), name, path);
-                    int id = MusicDatabaseStorage.get(getApplicationContext()).insert(music);
+            for (Uri fileUri : uris) {
+                String name = UriUtility.getFileName(fileUri, getContentResolver());
+                String path = fileUri.toString();
 
-                    if (id == -1) {
-                        Toast.makeText(getApplicationContext(), "Erreur", Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        music.setId(id);
-                        playlist.add(music);
+                final Music music = new Music(playlist.getId(), name, path);
+
+                final int id = MusicDatabaseStorage.get(getApplicationContext()).insert(music);
+
+                music.setOnBitmapUpdateListener(new OnBitmapUpdateListener() {
+                    @Override
+                    public void onBitmapUpdate() {
                         listAdapter.notifyDataSetChanged();
+                        MusicDatabaseStorage.get(getApplicationContext()).update(id, music);
                     }
+                });
+
+                if (id == -1) {
+                    Toast.makeText(getApplicationContext(), "Erreur", Toast.LENGTH_SHORT).show();
+                }
+                else {
+                    music.setId(id);
+                    playlist.add(music);
+                    listAdapter.add(music);
+                    listAdapter.notifyItemInserted(playlist.size() - 1);
                 }
             }
         }
