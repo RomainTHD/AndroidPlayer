@@ -9,11 +9,13 @@ import android.content.Intent;
 import android.content.ServiceConnection;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
+import android.graphics.Bitmap;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -112,6 +114,11 @@ public class MusicPlayerActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.title_next)).setText(playlist.getNext().getTitle());
 
         ((TextView) findViewById(R.id.title_previous)).setText(playlist.getPrevious().getTitle());
+
+        Bitmap bitmap = music.getPicture();
+        if (bitmap != null) {
+            ((ImageView) findViewById(R.id.music_picture_id)).setImageBitmap(bitmap);
+        }
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 

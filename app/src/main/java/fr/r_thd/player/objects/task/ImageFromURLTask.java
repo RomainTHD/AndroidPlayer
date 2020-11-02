@@ -8,13 +8,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
-import fr.r_thd.player.objects.Preview;
+import fr.r_thd.player.objects.Music;
 
 public class ImageFromURLTask extends AsyncTask<String, Void, Bitmap> {
-    private Preview preview;
+    private Music music;
 
-    public ImageFromURLTask(Preview preview) {
-        this.preview = preview;
+    public ImageFromURLTask(Music music) {
+        this.music = music;
     }
 
     @Override
@@ -34,6 +34,6 @@ public class ImageFromURLTask extends AsyncTask<String, Void, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        preview.setBitmap(bitmap);
+        music.setPicture(bitmap);
     }
 }

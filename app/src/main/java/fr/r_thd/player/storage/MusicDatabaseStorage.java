@@ -5,14 +5,10 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.provider.BaseColumns;
-import android.util.Base64;
 import android.util.Log;
 import android.util.Pair;
 
-import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,18 +72,7 @@ public class MusicDatabaseStorage extends DatabaseStorage<Music> {
         ContentValues values = new ContentValues();
         values.put(COL_TITLE.first, object.getTitle());
         values.put(COL_URI.first, object.getUri());
-
-        Bitmap bitmap = object.getPicture();
-        String encodedImage = null;
-
-        if (bitmap != null) {
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
-            byte[] byteArrayImage = outputStream.toByteArray();
-            encodedImage = Base64.encodeToString(byteArrayImage, Base64.DEFAULT);
-        }
-
-        values.put(COL_PICTURE.first, encodedImage);
+        values.put(COL_PICTURE.first, object.getBase64Picture());
         values.put(COL_PLAYLIST_ID.first, object.getPlaylistId());
         return values;
     }
