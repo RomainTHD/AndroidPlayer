@@ -165,23 +165,7 @@ public class MusicPlayerService extends Service implements
      * @param shouldPlay Doit jouer ou non
      */
     public void setMusic(String uriStr, final Boolean shouldPlay) {
-        if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-            caller.requestPermissions(new String[] {Manifest.permission.READ_EXTERNAL_STORAGE}, MusicPlayerActivity.REQUEST_EXTERNAL_STORAGE);
-        }
-
-        String externalDirectory = Environment.getExternalStorageDirectory().getPath();
-        String path = uriStr;
-
-        if (!uriStr.startsWith(externalDirectory)) {
-            path = externalDirectory + "/" + uriStr;
-        }
-
-        if (path.equals(currentPath)) {
-            return;
-        }
-
-        currentPath = path;
-        Uri uri = Uri.parse(path);
+        Uri uri = Uri.parse(uriStr);
 
         if (musicPlayer.isPlaying()) {
             musicPlayer.pause();
@@ -207,6 +191,7 @@ public class MusicPlayerService extends Service implements
         }
         catch (Exception e) {
             Toast.makeText(this, "Erreur lors du chargement de la musique", Toast.LENGTH_SHORT).show();
+            e.printStackTrace();
         }
     }
 

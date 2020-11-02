@@ -47,8 +47,8 @@ public abstract class UriUtility {
 
     @NonNull
     public static String getPath(@NonNull Uri uri) {
-        File file = new File(uri.getPath());//create path from uri
-        final String[] split = file.getPath().split(":");//split the path.
+        File file = new File(uri.getPath());
+        final String[] split = file.getPath().split(":");
         return split[1];
     }
 }
