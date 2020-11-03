@@ -1,2 +1,2 @@
-# PlayerAndroid
- Vidéo player pour Android
+# AndroidPlayer
+Audio player pour Android
