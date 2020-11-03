@@ -5,3 +5,5 @@ gradlew*
 *.properties
 *.gradle
 *.pro
+./src/main/java/fr/r_thd/player/config/*
+app/src/main/java/fr/r_thd/player/config/API.java

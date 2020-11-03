@@ -18,15 +18,48 @@ import java.util.List;
 
 import fr.r_thd.player.objects.Playlist;
 
-public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> implements Filterable {
+/**
+ * Adapter de playlist
+ */
+public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> implements Filterable {
     static class PlaylistHolder extends RecyclerView.ViewHolder {
         private final ImageView preview;
         private final TextView title;
 
-        public PlaylistHolder(@NonNull View itemView) {
+        public PlaylistHolder(final PlaylistAdapter playlistAdapter, @NonNull View itemView, final AdapterListener listener) {
             super(itemView);
+
             preview = itemView.findViewById(R.id.item_preview);
+            preview.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(playlistAdapter.getTruePos(getAdapterPosition()));
+                }
+            });
+
             title = itemView.findViewById(R.id.item_title);
+            title.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onClick(playlistAdapter.getTruePos(getAdapterPosition()));
+                }
+            });
+
+            ImageView editButton = itemView.findViewById(R.id.item_edit_button);
+            editButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onEditButtonClick(playlistAdapter.getTruePos(getAdapterPosition()));
+                }
+            });
+
+            ImageView deleteButton = itemView.findViewById(R.id.item_delete_button);
+            deleteButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onDeleteButtonClick(playlistAdapter.getTruePos(getAdapterPosition()));
+                }
+            });
         }
 
         public ImageView getPreview() {
@@ -42,11 +75,14 @@ public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapt
 
     private List<Playlist> playlistListCurrent;
 
+    private final AdapterListener listener;
+
     private final Filter filter;
 
-    public PlaylistAdapter(List<Playlist> playlistList) {
+    public PlaylistAdapter(List<Playlist> playlistList, AdapterListener listener) {
         this.playlistListFull = new ArrayList<>(playlistList);
         this.playlistListCurrent = playlistList;
+        this.listener = listener;
         this.filter = new Filter() {
             @Override
             protected FilterResults performFiltering(CharSequence constraint) {
@@ -84,21 +120,15 @@ public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapt
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_playlist_list, parent, false);
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PlaylistAdapter.this.onItemClick(v);
-            }
-        });
-
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                return PlaylistAdapter.this.onItemLongClick(v);
+                listener.onLongClick();
+                return true;
             }
         });
 
-        return new PlaylistHolder(view);
+        return new PlaylistHolder(this, view, listener);
     }
 
     @Override
@@ -116,7 +146,16 @@ public abstract class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapt
         return filter;
     }
 
-    public abstract void onItemClick(View v);
+    public void add(Playlist p) {
+        playlistListFull.add(p);
+    }
 
-    public abstract boolean onItemLongClick(View v);
+    public void remove(int i) {
+        playlistListFull.remove(i);
+    }
+
+    private int getTruePos(int pos) {
+        Playlist playlist = playlistListCurrent.get(pos);
+        return playlistListFull.indexOf(playlist);
+    }
 }

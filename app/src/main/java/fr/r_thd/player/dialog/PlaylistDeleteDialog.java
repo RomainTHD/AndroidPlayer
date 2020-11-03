@@ -9,19 +9,23 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import fr.r_thd.player.adapter.MusicAdapter;
+import java.util.List;
+
+import fr.r_thd.player.adapter.PlaylistAdapter;
+import fr.r_thd.player.objects.Music;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
+import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
-public class MusicDeleteDialog extends DialogFragment {
+public class PlaylistDeleteDialog extends DialogFragment {
     private final UpdatableFromDialog updatable;
-    private final Playlist playlist;
-    private final MusicAdapter adapter;
+    private final List<Playlist> playlistList;
+    private final PlaylistAdapter adapter;
     private final int pos;
 
-    public MusicDeleteDialog(UpdatableFromDialog updatable, Playlist playlist, MusicAdapter adapter, int pos) {
+    public PlaylistDeleteDialog(UpdatableFromDialog updatable, List<Playlist> playlistList, PlaylistAdapter adapter, int pos) {
         this.updatable = updatable;
-        this.playlist = playlist;
+        this.playlistList = playlistList;
         this.adapter = adapter;
         this.pos = pos;
     }
@@ -31,13 +35,20 @@ public class MusicDeleteDialog extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
         return new AlertDialog.Builder(getActivity())
                 .setTitle("Suppression")
-                .setMessage("Voulez-vous vraiment supprimer '" + playlist.get(pos).getTitle() + "' de la playlist ?")
+                .setMessage("Voulez-vous vraiment supprimer la playlist '" + playlistList.get(pos).getName() + "' ?")
                 .setPositiveButton("Oui", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        MusicDatabaseStorage.get(getContext()).delete(playlist.get(pos).getId());
+                        Playlist playlist = playlistList.get(pos);
+                        PlaylistDatabaseStorage.get(getContext()).delete(playlist.getId());
+                        List<Music> list = MusicDatabaseStorage.get(getContext()).findAll(playlist.getId());
+
+                        for (Music music : list) {
+                            MusicDatabaseStorage.get(getContext()).delete(music.getId());
+                        }
+
                         adapter.remove(pos);
-                        playlist.remove(pos);
+                        playlistList.remove(pos);
                         updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.DELETE);
                     }
                 })

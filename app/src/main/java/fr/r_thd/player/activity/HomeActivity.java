@@ -9,7 +9,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.SearchView;
@@ -18,13 +17,21 @@ import android.widget.Toast;
 import java.util.List;
 
 import fr.r_thd.player.R;
+import fr.r_thd.player.adapter.AdapterListener;
 import fr.r_thd.player.adapter.PlaylistAdapter;
+import fr.r_thd.player.dialog.PlaylistDeleteDialog;
+import fr.r_thd.player.dialog.PlaylistEditDialog;
+import fr.r_thd.player.dialog.UpdatableFromDialog;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
-public class HomeActivity extends AppCompatActivity {
+public class HomeActivity extends AppCompatActivity implements UpdatableFromDialog {
     public static final String EXTRA_DETAILS_PLAYLIST_ID = "EXTRA_DETAILS_PLAYLIST_ID";
+
+    private PlaylistAdapter playlistAdapter;
+
+    private List<Playlist> playlistList;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,56 +50,37 @@ public class HomeActivity extends AppCompatActivity {
 
         ////////////////////////////////////////////////////////////////////////////////////////////
 
-        final List<Playlist> playlistList = PlaylistDatabaseStorage.get(getApplicationContext()).findAll();
+        playlistList = PlaylistDatabaseStorage.get(getApplicationContext()).findAll();
 
         setContentView(R.layout.activity_home);
 
         final RecyclerView list = findViewById(R.id.playlist_list);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        final PlaylistAdapter playlistAdapter = new PlaylistAdapter(playlistList) {
+        playlistAdapter = new PlaylistAdapter(playlistList, new AdapterListener() {
             @Override
-            public void onItemClick(View v) {
-                Playlist playlist = playlistList.get(list.getChildViewHolder(v).getAdapterPosition());
+            public void onLongClick() {
+                Toast.makeText(getApplicationContext(), "Détails d'une playlist", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onClick(int pos) {
+                Playlist playlist = playlistList.get(pos);
                 Intent intent = new Intent(getApplicationContext(), PlaylistActivity.class);
                 intent.putExtra(EXTRA_DETAILS_PLAYLIST_ID, playlist.getId());
                 startActivity(intent);
             }
 
             @Override
-            public boolean onItemLongClick(final View v) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(HomeActivity.this);
-                builder.setTitle("Modifier le nom de la playlist");
-
-                final EditText input = new EditText(HomeActivity.this);
-                input.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_NORMAL);
-                input.setText(playlistList.get(list.getChildViewHolder(v).getAdapterPosition()).getName());
-                builder.setView(input);
-
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        String name = input.getText().toString().trim();
-
-                        if (!name.isEmpty()) {
-                            playlistList.get(list.getChildViewHolder(v).getAdapterPosition()).setName(name);
-                            notifyDataSetChanged();
-                        }
-                    }
-                });
-
-                builder.setNegativeButton("Annuler", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
-                    }
-                });
-
-                builder.show();
-
-                return true;
+            public void onEditButtonClick(int pos) {
+                new PlaylistEditDialog(HomeActivity.this, playlistList, pos).show(getSupportFragmentManager(), "");
             }
-        };
+
+            @Override
+            public void onDeleteButtonClick(int pos) {
+                new PlaylistDeleteDialog(HomeActivity.this, playlistList, playlistAdapter, pos).show(getSupportFragmentManager(), "");
+            }
+        });
 
         list.setAdapter(playlistAdapter);
 
@@ -121,6 +109,7 @@ public class HomeActivity extends AppCompatActivity {
                             if (id != -1) {
                                 playlist.setId(id);
                                 playlistList.add(playlist);
+                                playlistAdapter.add(playlist);
                                 playlistAdapter.notifyDataSetChanged();
                             }
                         }
@@ -161,5 +150,15 @@ public class HomeActivity extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    @Override
+    public void updateFromDialog(int pos, UpdatableFromDialog.UpdateType type) {
+        if (type == UpdateType.EDIT) {
+            playlistAdapter.notifyItemChanged(pos);
+        }
+        else if (type == UpdateType.DELETE) {
+            playlistAdapter.notifyItemRemoved(pos);
+        }
     }
 }
