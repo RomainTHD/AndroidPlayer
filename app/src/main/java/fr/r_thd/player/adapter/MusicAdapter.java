@@ -16,7 +16,6 @@ import java.util.List;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.objects.Music;
-import fr.r_thd.player.objects.Playlist;
 
 /**
  * Adapter de musique
@@ -39,9 +38,11 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
         /**
          * Constructeur
          *
+         * @param musicAdapter Adapter
          * @param itemView Item
+         * @param listener Listener
          */
-        public MusicHolder(final MusicAdapter musicAdapter, @NonNull View itemView, final MusicAdapterListener listener) {
+        public MusicHolder(@NonNull final MusicAdapter musicAdapter, @NonNull View itemView, @NonNull final AdapterListener listener) {
             super(itemView);
 
             preview = itemView.findViewById(R.id.item_preview);
@@ -76,33 +77,37 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
                 }
             });
         }
-
-        public ImageView getPreview() {
-            return preview;
-        }
-
-        public TextView getTitle() {
-            return title;
-        }
     }
 
     /**
-     * Playlist associée
+     * Playlist associée full
      */
     private final List<Music> playlistFull;
 
     /**
-     * Playlist associée
+     * Playlist associée filtrée
      */
-    private List<Music> playlistCurrent;
+    private final List<Music> playlistCurrent;
 
-    private final MusicAdapterListener listener;
+    /**
+     * Listener
+     */
+    private final AdapterListener listener;
 
+    /**
+     * Filtre
+     */
     private final Filter filter;
 
-    public MusicAdapter(final List<Music> playlist, MusicAdapterListener listener) {
-        this.playlistFull = new ArrayList<>(playlist);
-        this.playlistCurrent = playlist;
+    /**
+     * Constructeur
+     *
+     * @param playlist Playlist
+     * @param listener Listener
+     */
+    public MusicAdapter(@NonNull final List<Music> playlist, @NonNull AdapterListener listener) {
+        this.playlistFull = playlist;
+        this.playlistCurrent = new ArrayList<>(playlist);
         this.listener = listener;
         this.filter = new Filter() {
             @Override
@@ -155,6 +160,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
     @Override
     public void onBindViewHolder(@NonNull MusicAdapter.MusicHolder holder, final int position) {
         holder.title.setText(playlistCurrent.get(position).getTitle());
+        holder.preview.setImageBitmap(playlistCurrent.get(position).getPicture());
     }
 
     @Override
@@ -163,8 +169,19 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
     }
 
     @Override
+    @NonNull
     public Filter getFilter() {
         return filter;
+    }
+
+    public void add(@NonNull Music m) {
+        playlistCurrent.add(m);
+        playlistFull.add(m);
+    }
+
+    public void remove(int i) {
+        playlistCurrent.remove(playlistFull.get(i));
+        playlistFull.remove(i);
     }
 
     private int getTruePos(int pos) {

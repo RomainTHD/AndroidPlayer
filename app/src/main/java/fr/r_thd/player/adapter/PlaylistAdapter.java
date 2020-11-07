@@ -23,13 +23,12 @@ import fr.r_thd.player.objects.Playlist;
  */
 public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.PlaylistHolder> implements Filterable {
     static class PlaylistHolder extends RecyclerView.ViewHolder {
-        private final ImageView preview;
         private final TextView title;
 
         public PlaylistHolder(final PlaylistAdapter playlistAdapter, @NonNull View itemView, final AdapterListener listener) {
             super(itemView);
 
-            preview = itemView.findViewById(R.id.item_preview);
+            ImageView preview = itemView.findViewById(R.id.item_preview);
             preview.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -61,27 +60,19 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
                 }
             });
         }
-
-        public ImageView getPreview() {
-            return preview;
-        }
-
-        public TextView getTitle() {
-            return title;
-        }
     }
 
     private final List<Playlist> playlistListFull;
 
-    private List<Playlist> playlistListCurrent;
+    private final List<Playlist> playlistListCurrent;
 
     private final AdapterListener listener;
 
     private final Filter filter;
 
     public PlaylistAdapter(List<Playlist> playlistList, AdapterListener listener) {
-        this.playlistListFull = new ArrayList<>(playlistList);
-        this.playlistListCurrent = playlistList;
+        this.playlistListFull = playlistList;
+        this.playlistListCurrent = new ArrayList<>(playlistList);
         this.listener = listener;
         this.filter = new Filter() {
             @Override
@@ -147,10 +138,12 @@ public class PlaylistAdapter extends RecyclerView.Adapter<PlaylistAdapter.Playli
     }
 
     public void add(Playlist p) {
+        playlistListCurrent.add(p);
         playlistListFull.add(p);
     }
 
     public void remove(int i) {
+        playlistListCurrent.remove(playlistListFull.get(i));
         playlistListFull.remove(i);
     }
 
