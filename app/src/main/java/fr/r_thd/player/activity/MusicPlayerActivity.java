@@ -28,6 +28,9 @@ import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
+/**
+ * Activité de player de musique
+ */
 public class MusicPlayerActivity extends AppCompatActivity {
     public static final String EXTRA_CURRENT_PLAYLIST_ID = "EXTRA_CURRENT_PLAYLIST";
     public static final String EXTRA_SELECTED_MUSIC_INDEX = "EXTRA_SELECTED_MUSIC_INDEX";
@@ -35,15 +38,34 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
     public static final int REQUEST_EXTERNAL_STORAGE = 12345;
 
+    /**
+     * Playlist
+     */
     private Playlist playlist;
+
+    /**
+     * Musique courante
+     */
     private Music music;
 
+    /**
+     * Service de lecture de musique
+     */
     private MusicPlayerService musicPlayerService;
 
+    /**
+     * Connexion au service
+     */
     private ServiceConnection connection;
 
+    /**
+     * Observer du volume
+     */
     private ContentObserver volumeObserver;
 
+    /**
+     * Doit jouer directement ou non
+     */
     private boolean shouldPlay;
 
     @Override
@@ -56,14 +78,14 @@ public class MusicPlayerActivity extends AppCompatActivity {
         int musicIndex = getIntent().getIntExtra(MusicPlayerActivity.EXTRA_SELECTED_MUSIC_INDEX, -1);
 
         if (id == -1 || musicIndex == -1) {
-            Toast.makeText(getApplicationContext(), "ID nul", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.err_null_id), Toast.LENGTH_LONG).show();
             return;
         }
 
         playlist = PlaylistDatabaseStorage.get(getApplicationContext()).find(id);
 
         if (playlist == null) {
-            Toast.makeText(getApplicationContext(), "Playlist nulle", Toast.LENGTH_LONG).show();
+            Toast.makeText(getApplicationContext(), getString(R.string.err_null_playlist), Toast.LENGTH_LONG).show();
             return;
         }
 
@@ -71,8 +93,50 @@ public class MusicPlayerActivity extends AppCompatActivity {
 
         music = playlist.get();
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
+        setVolumeBar();
 
+        ((TextView) findViewById(R.id.music_title)).setText(music.getTitle());
+
+        ((TextView) findViewById(R.id.title_next)).setText(playlist.getNext().getTitle());
+
+        ((TextView) findViewById(R.id.title_previous)).setText(playlist.getPrevious().getTitle());
+
+        Bitmap bitmap = music.getPicture();
+        if (bitmap != null) {
+            ((ImageView) findViewById(R.id.music_picture_id)).setImageBitmap(bitmap);
+        }
+
+        bindButtons();
+
+        Object shouldPlayObj = getIntent()
+                .getSerializableExtra(EXTRA_SHOULD_PLAY);
+
+        shouldPlay = false;
+
+        if (shouldPlayObj != null) {
+            shouldPlay = (Boolean) shouldPlayObj;
+        }
+    }
+
+    private void startPreviousMusic() {
+        Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
+        intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
+        intent.putExtra(EXTRA_SELECTED_MUSIC_INDEX, playlist.getPreviousIndex());
+        intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
+        startActivity(intent);
+        finish();
+    }
+
+    private void startNextMusic() {
+        Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
+        intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
+        intent.putExtra(EXTRA_SELECTED_MUSIC_INDEX, playlist.getNextIndex());
+        intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
+        startActivity(intent);
+        finish();
+    }
+
+    private void setVolumeBar() {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
         final SeekBar volumeSeekBar = findViewById(R.id.volume_seek_bar);
@@ -87,14 +151,10 @@ public class MusicPlayerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStartTrackingTouch(SeekBar seekBar) {}
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-
-            }
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
         volumeObserver = new ContentObserver(new Handler()) {
@@ -106,22 +166,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
         };
 
         getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, volumeObserver);
+    }
 
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        ((TextView) findViewById(R.id.music_title)).setText(music.getTitle());
-
-        ((TextView) findViewById(R.id.title_next)).setText(playlist.getNext().getTitle());
-
-        ((TextView) findViewById(R.id.title_previous)).setText(playlist.getPrevious().getTitle());
-
-        Bitmap bitmap = music.getPicture();
-        if (bitmap != null) {
-            ((ImageView) findViewById(R.id.music_picture_id)).setImageBitmap(bitmap);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
+    private void bindButtons() {
         final FloatingActionButton playPauseButton = findViewById(R.id.button_play_pause);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -159,35 +206,6 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 startNextMusic();
             }
         });
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
-
-        Object shouldPlayObj = getIntent()
-                .getSerializableExtra(EXTRA_SHOULD_PLAY);
-
-        shouldPlay = false;
-
-        if (shouldPlayObj != null) {
-            shouldPlay = (Boolean) shouldPlayObj;
-        }
-    }
-
-    private void startPreviousMusic() {
-        Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-        intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
-        intent.putExtra(EXTRA_SELECTED_MUSIC_INDEX, playlist.getPreviousIndex());
-        intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
-        startActivity(intent);
-        finish();
-    }
-
-    private void startNextMusic() {
-        Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
-        intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
-        intent.putExtra(EXTRA_SELECTED_MUSIC_INDEX, playlist.getNextIndex());
-        intent.putExtra(EXTRA_SHOULD_PLAY, Boolean.valueOf(MusicPlayerService.isPlaying()));
-        startActivity(intent);
-        finish();
     }
 
     @Override
@@ -233,7 +251,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_EXTERNAL_STORAGE) {
             if (grantResults.length == 0 || grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(getApplicationContext(), "Cette application nécessite des permissions pour continuer", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), getString(R.string.warn_no_permissions), Toast.LENGTH_SHORT).show();
             }
         }
     }

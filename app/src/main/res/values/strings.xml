@@ -1,4 +1,42 @@
 <resources>
     <string name="app_name">Player</string>
     <string name="title_activity_playlist">Playlist</string>
+
+    <string name="dialog_playlist_title">Créer une playlist</string>
+    <string name="dialog_playlist_hint">Nom de la playlist</string>
+
+    <string name="dialog_playlist_delete_name">Suppression d\'une playlist</string>
+    <string name="dialog_playlist_confirm">Voulez-vous vraiment supprimer la playlist %1$s ?</string>
+    <string name="dialog_playlist_edit_name">Modification d\'une playlist</string>
+
+    <string name="dialog_music_delete_name">Suppression d\'une musique</string>
+    <string name="dialog_music_confirm">Voulez-vous vraiment supprimer %1$s de la playlist ?</string>
+    <string name="dialog_music_edit_name">Modification d\'une musique</string>
+
+    <string name="chooser_music_title">Ajout d\'une musique</string>
+
+    <string name="ok">OK</string>
+    <string name="cancel">Annuler</string>
+    <string name="yes">Oui</string>
+    <string name="no">Non</string>
+
+    <string name="hint_create_playlist">Créer une playlist</string>
+    <string name="hint_detail_playlist">Détails d\'un élément</string>
+    <string name="hint_shuffle_playlist">Sélectionne une musique aléatoire</string>
+
+    <string name="warn_empty_playlist">Playlist vide</string>
+    <string name="warn_no_permissions">Cette application nécessite des permissions pour continuer</string>
+
+    <string name="err_null_id">ID null</string>
+    <string name="err_null_playlist">Playlist nulle</string>
+    <string name="err_general">Erreur</string>
+
+
+    <string name="app_version_number">1.0</string>
+    <string name="menu_settings">Settings</string>
+
+    <string name="cd_repeat">Repeat one or all</string>
+    <string name="cd_previous">Skip backwards</string>
+    <string name="cd_play">Play and pause</string>
+    <string name="cd_next">Skip forwards</string>
 </resources>

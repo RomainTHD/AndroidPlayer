@@ -17,13 +17,35 @@ import fr.r_thd.player.R;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.PlaylistDatabaseStorage;
 
+/**
+ * Dialog d'édition de titre de playlist
+ */
 public class PlaylistEditDialog extends DialogFragment {
+    /**
+     * Updatable
+     */
+    @NonNull
     private final UpdatableFromDialog updatable;
-    private final int pos;
-    private Playlist edited;
-    private View view;
 
-    public PlaylistEditDialog(UpdatableFromDialog updatable, List<Playlist> playlistList, int pos) {
+    /**
+     * Position
+     */
+    private final int pos;
+
+    /**
+     * Playlist modifiée
+     */
+    @NonNull
+    private final Playlist edited;
+
+    /**
+     * Constructeur
+     *
+     * @param updatable Updatable
+     * @param playlistList Liste de playlist
+     * @param pos Position
+     */
+    public PlaylistEditDialog(@NonNull UpdatableFromDialog updatable, @NonNull List<Playlist> playlistList, int pos) {
         this.updatable = updatable;
         this.pos = pos;
         this.edited = playlistList.get(pos);
@@ -32,28 +54,28 @@ public class PlaylistEditDialog extends DialogFragment {
     @NonNull
     @Override
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        view = requireActivity().getLayoutInflater().inflate(R.layout.dialog_edit_music, null);
-        setMusicToView();
+        final View view = requireActivity().getLayoutInflater().inflate(R.layout.dialog_edit_music, null);
+        setMusicToView(view);
         return new AlertDialog.Builder(getActivity())
-                .setTitle("Modifier une musique")
+                .setTitle(getString(R.string.dialog_playlist_edit_name))
                 .setView(view)
-                .setPositiveButton("Valider", new DialogInterface.OnClickListener() {
+                .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Playlist playlist = getMusicFromView();
+                        Playlist playlist = getMusicFromView(view);
                         PlaylistDatabaseStorage.get(getContext()).update(playlist.getId(), playlist);
                         updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.EDIT);
                     }
                 })
-                .setNegativeButton("Annuler", null)
+                .setNegativeButton(getString(R.string.cancel), null)
                 .create();
     }
 
-    private void setMusicToView() {
+    private void setMusicToView(View view) {
         ((EditText) view.findViewById(R.id.music_title)).setText(edited.getName());
     }
 
-    private Playlist getMusicFromView() {
+    private Playlist getMusicFromView(View view) {
         edited.setName(((EditText) view.findViewById(R.id.music_title)).getText().toString());
         return edited;
     }
