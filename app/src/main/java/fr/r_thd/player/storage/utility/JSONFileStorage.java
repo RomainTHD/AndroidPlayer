@@ -2,6 +2,8 @@ package fr.r_thd.player.storage.utility;
 
 import android.content.Context;
 
+import androidx.annotation.NonNull;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -37,6 +39,7 @@ public abstract class JSONFileStorage<T> extends FileStorage<T> {
         return object;
     }
 
+    @NonNull
     @Override
     public List<T> findAll() {
         ArrayList<T> list = new ArrayList<>();
@@ -71,7 +74,7 @@ public abstract class JSONFileStorage<T> extends FileStorage<T> {
     }
 
     @Override
-    public int insert(T elem) {
+    public int insert(@NonNull T elem) {
         int nextId = json.optInt(NEXT_ID);
 
         try {
@@ -88,7 +91,7 @@ public abstract class JSONFileStorage<T> extends FileStorage<T> {
     }
 
     @Override
-    public boolean update(int id, T elem) {
+    public boolean update(int id, @NonNull T elem) {
         boolean ok = false;
 
         try {

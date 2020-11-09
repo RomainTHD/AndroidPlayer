@@ -2,6 +2,9 @@ package fr.r_thd.player.objects.task;
 
 import android.os.AsyncTask;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -13,23 +16,42 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
+import fr.r_thd.player.config.API;
 import fr.r_thd.player.objects.Music;
 
+/**
+ * Image depuis un titre
+ */
 public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
+    /**
+     * Musique
+     */
+    @NonNull
     private final Music music;
 
-    private static final String API_KEY = "AIzaSyAn0oOafyYgufgOzAQdmHzAlCTKaUmZm0c";
-
-    public ImageFromTitleTask(Music music) {
+    /**
+     * Constructeur
+     *
+     * @param music Musique
+     */
+    public ImageFromTitleTask(@NonNull Music music) {
         this.music = music;
     }
 
+    /**
+     * Background
+     *
+     * @param titles Titres
+     *
+     * @return JSON de YouTube
+     */
+    @Nullable
     @Override
-    protected String doInBackground(String... titles) {
+    protected String doInBackground(@NonNull String... titles) {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         String title = titles[0];
-        String apiKey = API_KEY;
+        String apiKey = API.API_KEY.replace('_', 'a');
 
         try {
             URL url = new URL("https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + title + "&relevanceLanguage=fr-FR&type=video&key=" + apiKey);
@@ -70,108 +92,43 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
         return null;
     }
 
+    /**
+     * Après l'exécution
+     *
+     * @param JSONString String JSON
+     */
     @Override
-    protected void onPostExecute(String JSONString) {
-        JSONObject jsonObject;
+    protected void onPostExecute(@Nullable String JSONString) {
+        if (JSONString == null) {
+            return;
+        }
+
+        String url = null;
 
         try {
-            jsonObject = new JSONObject(JSONString);
+            JSONObject jsonObject = new JSONObject(JSONString);
+            JSONObject pageInfo = jsonObject.getJSONObject("pageInfo");
+            int nbResults = pageInfo.getInt("totalResults");
+
+            if (nbResults != 0) {
+                JSONArray items = jsonObject.getJSONArray("items");
+
+                if (items.length() != 0) {
+                    JSONObject item = items.getJSONObject(0);
+                    JSONObject snippet = item.getJSONObject("snippet");
+                    JSONObject thumbnails = snippet.getJSONObject("thumbnails");
+                    JSONObject medium = thumbnails.getJSONObject("medium");
+                    url = medium.getString("url");
+                }
+            }
         }
         catch (JSONException e) {
+            // Ban ou pas de résultats
             e.printStackTrace();
-            return;
         }
 
-        JSONObject pageInfo;
-
-        try {
-            pageInfo = jsonObject.getJSONObject("pageInfo");
+        if (url != null) {
+            new ImageFromURLTask(this.music).execute(url);
         }
-        catch (JSONException e) {
-            // Sûrement ban
-            e.printStackTrace();
-            return;
-        }
-
-        int nbResults;
-
-        try {
-            nbResults = pageInfo.getInt("totalResults");
-        }
-        catch (JSONException e) {
-            // Sûrement ban
-            e.printStackTrace();
-            return;
-        }
-
-        if (nbResults == 0) {
-            return;
-        }
-
-        JSONArray items;
-
-        try {
-            items = jsonObject.getJSONArray("items");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        if (items.length() == 0) {
-            return;
-        }
-
-        JSONObject item;
-
-        try {
-            item = items.getJSONObject(0);
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        JSONObject snippet;
-
-        try {
-            snippet = item.getJSONObject("snippet");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        JSONObject thumbnails;
-
-        try {
-            thumbnails = snippet.getJSONObject("thumbnails");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        JSONObject medium;
-
-        try {
-            medium = thumbnails.getJSONObject("medium");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        String url;
-
-        try {
-            url = medium.getString("url");
-        }
-        catch (JSONException e) {
-            e.printStackTrace();
-            return;
-        }
-
-        new ImageFromURLTask(this.music).execute(url);
     }
 }

@@ -25,24 +25,37 @@ public class Playlist {
      * Contenu, musiques
      */
     @NonNull
-    private ArrayList<Music> content;
+    private final ArrayList<Music> content;
 
     /**
      * Indexes, ordre des musiques
      */
     @NonNull
-    private transient ArrayList<Integer> indexes;
+    private final ArrayList<Integer> indexes;
 
     /**
      * Index de lecture courant
      */
-    private transient int currentIndex;
+    private int currentIndex;
 
+    /**
+     * Constructeur vide
+     *
+     * @param name Nom
+     */
     public Playlist(@NonNull String name) {
         this(-1, name, new ArrayList<Music>());
     }
 
-    public Playlist(int id, @NonNull String name, List<Music> musicList) {
+    /**
+     * Constructeur
+     *
+     * @param id Id
+     * @param name Nom
+     * @param musicList Liste de musiques
+     */
+    public Playlist(int id, @NonNull String name, @NonNull List<Music> musicList) {
+        // TODO: set directement à musicList ?
         this.content = new ArrayList<>();
         this.indexes = new ArrayList<>();
         this.currentIndex = 0;
@@ -54,6 +67,11 @@ public class Playlist {
         }
     }
 
+    /**
+     * Set id
+     *
+     * @param id Id
+     */
     public void setId(int id) {
         this.id = id;
     }
@@ -76,79 +94,104 @@ public class Playlist {
     }
 
     /**
-     * Supprime une musique
-     *
-     * @param i Index
+     * @return Id
      */
-    public void remove(int i) {
-        content.remove(i);
-        indexes.remove((Integer) i);
-    }
-
     public int getId() {
         return id;
     }
 
+    /**
+     * @return Musique courante
+     */
+    @NonNull
     public Music get() {
         return get(currentIndex);
     }
 
+    /**
+     * @return Nom de la playlist
+     */
+    @NonNull
     public String getName() {
         return name;
     }
 
+    /**
+     * @return Taille
+     */
     public int size() {
         return content.size();
     }
 
+    /**
+     * Set index courant
+     *
+     * @param currentIndex Index courant
+     */
     public void setCurrentIndex(int currentIndex) {
         this.currentIndex = (currentIndex + size()) % size();
     }
 
+    /**
+     * @param i Index
+     *
+     * @return Musique `i`
+     */
+    @NonNull
     public Music get(int i) {
-        if (size() != 0) {
-            i = (i + size()) % size();
-        }
-        int index = indexes.get(i);
-        return content.get(index);
+        return content.get(indexes.get((i + size()) % size()));
     }
 
+    /**
+     * @return Liste des musiques
+     */
+    @NonNull
     public List<Music> getArray() {
         return content;
     }
 
-    public Music previous() {
-        currentIndex = (currentIndex + size() - 1) % size();
-        return get();
-    }
-
-    public Music next() {
-        currentIndex = (currentIndex + 1) % size();
-        return get();
-    }
-
+    /**
+     * @return Musique précédente
+     */
+    @NonNull
     public Music getPrevious() {
         return get(currentIndex - 1);
     }
 
+    /**
+     * @return Index précédent
+     */
     public int getPreviousIndex() {
         return indexes.get((currentIndex + size() - 1) % size());
     }
 
+    /**
+     * @return Musique suivante
+     */
+    @NonNull
     public Music getNext() {
         return get(currentIndex + 1);
     }
 
+    /**
+     * @return Index suivant
+     */
     public int getNextIndex() {
         return indexes.get((currentIndex + 1) % size());
     }
 
+    /**
+     * @return Index random
+     */
     public int getRandomIndex() {
         Random r = new Random();
         int i = r.nextInt(size());
         return indexes.get(i);
     }
 
+    /**
+     * Shuffle la playlist
+     */
     public void shuffle() {
         Random r = new Random();
 

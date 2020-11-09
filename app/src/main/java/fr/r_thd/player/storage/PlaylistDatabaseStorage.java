@@ -6,10 +6,9 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.provider.BaseColumns;
-import android.util.Log;
 import android.util.Pair;
 
-import java.util.List;
+import androidx.annotation.NonNull;
 
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.utility.DatabaseStorage;
@@ -59,6 +58,7 @@ public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
         super(new DatabaseHelper(context), TABLE_NAME);
     }
 
+    @NonNull
     @Override
     protected ContentValues objectToContentValues(int id, Playlist object) {
         ContentValues values = new ContentValues();
@@ -66,8 +66,9 @@ public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
         return values;
     }
 
+    @NonNull
     @Override
-    protected Playlist cursorToObject(Cursor cursor) {
+    protected Playlist cursorToObject(@NonNull Cursor cursor) {
         int playlistId = cursor.getInt(COL_ID.second);
 
         return new Playlist(

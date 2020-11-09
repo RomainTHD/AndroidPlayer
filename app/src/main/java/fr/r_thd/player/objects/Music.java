@@ -2,8 +2,6 @@ package fr.r_thd.player.objects;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Parcel;
-import android.os.Parcelable;
 import android.util.Base64;
 
 import androidx.annotation.NonNull;
@@ -16,7 +14,7 @@ import fr.r_thd.player.objects.task.ImageFromTitleTask;
 /**
  * Musique
  */
-public class Music implements Parcelable {
+public class Music {
     /**
      * ID
      */
@@ -39,10 +37,25 @@ public class Music implements Parcelable {
     @NonNull
     private final String uri;
 
+    /**
+     * Photo
+     */
+    @Nullable
     private transient Bitmap picture;
 
-    public OnBitmapUpdateListener listener;
+    /**
+     * Listener
+     */
+    @Nullable
+    private transient OnBitmapUpdateListener listener;
 
+    /**
+     * Constructeur sans id
+     *
+     * @param playlistId Id de la playlist
+     * @param title Titre
+     * @param uri URI
+     */
     public Music(int playlistId, @NonNull String title, @NonNull String uri) {
         this(-1, playlistId, title, uri, null);
     }
@@ -50,8 +63,11 @@ public class Music implements Parcelable {
     /**
      * Constructeur
      *
+     * @param id Id
+     * @param playlistId Id de la playlist
      * @param title Titre
      * @param uri URI
+     * @param imageBase64 Image en base64
      */
     public Music(int id, int playlistId, @NonNull String title, @NonNull String uri, @Nullable String imageBase64) {
         this.id = id;
@@ -69,36 +85,25 @@ public class Music implements Parcelable {
         }
     }
 
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeParcelable(picture, flags);
-    }
-
-    public static final Parcelable.Creator<Music> CREATOR = new Parcelable.Creator<Music>() {
-        @Override
-        public Music createFromParcel(Parcel source) {
-            return null;
-        }
-
-        @Override
-        public Music[] newArray(int size) {
-            return null;
-        }
-    };
-
+    /**
+     * @return Id
+     */
     public int getId() {
         return id;
     }
 
+    /**
+     * Set id
+     *
+     * @param id Id
+     */
     public void setId(int id) {
         this.id = id;
     }
 
+    /**
+     * @return Id de la playlist
+     */
     public int getPlaylistId() {
         return playlistId;
     }
@@ -127,11 +132,20 @@ public class Music implements Parcelable {
         return uri;
     }
 
+    /**
+     * @return Picture
+     */
+    @Nullable
     public Bitmap getPicture() {
         return picture;
     }
 
-    public void setPicture(Bitmap picture) {
+    /**
+     * Set picture
+     *
+     * @param picture Picture
+     */
+    public void setPicture(@NonNull Bitmap picture) {
         this.picture = picture;
 
         if (listener != null) {
@@ -139,6 +153,10 @@ public class Music implements Parcelable {
         }
     }
 
+    /**
+     * @return Image en base64
+     */
+    @Nullable
     public String getBase64Picture() {
         if (picture == null) {
             return null;
@@ -160,7 +178,12 @@ public class Music implements Parcelable {
         return res;
     }
 
-    public void setOnBitmapUpdateListener(OnBitmapUpdateListener listener) {
+    /**
+     * Set le listener
+     *
+     * @param listener Listener
+     */
+    public void setOnBitmapUpdateListener(@NonNull OnBitmapUpdateListener listener) {
         this.listener = listener;
     }
 }

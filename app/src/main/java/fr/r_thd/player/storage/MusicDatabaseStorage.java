@@ -9,6 +9,8 @@ import android.provider.BaseColumns;
 import android.util.Log;
 import android.util.Pair;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -68,7 +70,8 @@ public class MusicDatabaseStorage extends DatabaseStorage<Music> {
     }
 
     @Override
-    protected ContentValues objectToContentValues(int id, Music object) {
+    @NonNull
+    protected ContentValues objectToContentValues(int id, @NonNull Music object) {
         ContentValues values = new ContentValues();
         values.put(COL_TITLE.first, object.getTitle());
         values.put(COL_URI.first, object.getUri());
@@ -78,7 +81,8 @@ public class MusicDatabaseStorage extends DatabaseStorage<Music> {
     }
 
     @Override
-    protected Music cursorToObject(Cursor cursor) {
+    @NonNull
+    protected Music cursorToObject(@NonNull Cursor cursor) {
         return new Music(
                 cursor.getInt(COL_ID.second),
                 cursor.getInt(COL_PLAYLIST_ID.second),
@@ -88,12 +92,14 @@ public class MusicDatabaseStorage extends DatabaseStorage<Music> {
         );
     }
 
+    @NonNull
     @Override
     public List<Music> findAll() {
         Log.e("test", "test");
         return super.findAll();
     }
 
+    @NonNull
     public List<Music> findAll(int playlistId) {
         List<Music> list = new ArrayList<>();
         Cursor cursor = helper.getReadableDatabase().query(
