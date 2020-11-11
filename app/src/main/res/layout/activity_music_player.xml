@@ -16,7 +16,6 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textFontWeight="30"
-            android:text="Titre"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:padding="20dp" />
 
@@ -29,11 +28,13 @@
             <ImageView
                 android:id="@+id/music_picture_id"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="0dp"
                 android:layout_marginLeft="20dp"
                 android:layout_marginRight="20dp"
                 android:layout_marginBottom="10dp"
-                android:layout_weight="1" />
+                android:layout_weight="1"
+                android:src="@drawable/ic_no_preview"
+                android:contentDescription="@string/desc_player_picture" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -67,37 +68,41 @@
             android:baselineAligned="false">
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <Button
                     android:id="@+id/button_previous"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
+                    android:layout_gravity="start"
                     android:gravity="center"
-                    android:text="Previous" />
+                    android:text="@string/previous" />
 
                 <TextView
                     android:id="@+id/title_previous"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_gravity="start"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="-" />
+                    android:ellipsize="end"
+                    android:maxLength="24"
+                    android:maxLines="1" />
             </LinearLayout>
 
             <TextView
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="2" />
+                android:layout_weight="1.25" />
 
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="2"
+                android:layout_weight="1"
                 android:orientation="vertical">
 
                 <Button
@@ -105,16 +110,20 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center"
-                    android:text="Next" />
+                    android:layout_gravity="end"
+                    android:text="@string/next" />
 
                 <TextView
                     android:id="@+id/title_next"
-                    android:layout_width="match_parent"
+                    android:layout_width="wrap_content"
                     android:layout_height="match_parent"
+                    android:layout_gravity="end"
                     android:gravity="end"
                     android:paddingStart="10dp"
                     android:paddingEnd="10dp"
-                    android:text="-" />
+                    android:ellipsize="end"
+                    android:maxLength="24"
+                    android:maxLines="1" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -126,5 +135,6 @@
         android:layout_gravity="bottom|center"
         android:layout_margin="56dp"
         android:tint="@android:color/white"
-        android:src="@drawable/ic_play" />
+        android:src="@drawable/ic_play"
+        android:contentDescription="@string/desc_pause_button" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
