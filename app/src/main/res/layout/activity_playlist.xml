@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -13,13 +12,23 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content">
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
 
             <SearchView
                 android:id="@+id/search_bar_music"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent" />
 
+            <TextView
+                android:id="@+id/no_result"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:textSize="16sp"
+                android:padding="20dp"
+                android:paddingStart="40dp"
+                android:paddingEnd="40dp"
+                android:text="@string/no_result" />
         </LinearLayout>
 
         <LinearLayout
@@ -42,7 +51,8 @@
         android:layout_gravity="bottom|start"
         android:layout_margin="16dp"
         android:tint="@android:color/white"
-        android:src="@drawable/ic_shuffle" />
+        android:src="@drawable/ic_shuffle"
+        android:contentDescription="@string/desc_shuffle_button" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/button_add"
@@ -51,5 +61,6 @@
         android:layout_gravity="bottom|end"
         android:layout_margin="16dp"
         android:tint="@android:color/white"
-        android:src="@drawable/ic_add" />
+        android:src="@drawable/ic_add"
+        android:contentDescription="@string/desc_add_button" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
