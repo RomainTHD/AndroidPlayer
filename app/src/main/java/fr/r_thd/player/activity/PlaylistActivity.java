@@ -105,13 +105,6 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
             @Override
             public void onEditButtonClick(int pos) {
-                // TODO:
-                /*
-                Intent serviceIntent = new Intent(getApplicationContext(), NotificationService.class);
-                serviceIntent.setAction(NotificationService.STARTFOREGROUND_ACTION);
-                startService(serviceIntent);
-                 */
-
                 new MusicEditDialog(PlaylistActivity.this, playlist, pos).show(getSupportFragmentManager(), "");
             }
 
@@ -156,12 +149,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             public void onChanged() {
                 super.onChanged();
                 View noResultView = findViewById(R.id.no_result);
-                if (listAdapter.getItemCount() == 0) {
-                    noResultView.getLayoutParams().height = LinearLayout.LayoutParams.MATCH_PARENT;
-                }
-                else {
-                    noResultView.getLayoutParams().height = 0;
-                }
+                noResultView.getLayoutParams().height = (listAdapter.getItemCount() == 0) ? LinearLayout.LayoutParams.MATCH_PARENT : 0;
                 noResultView.requestLayout();
             }
         });
@@ -173,9 +161,8 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
         findViewById(R.id.button_shuffle).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (playlist.size() == 0) {
+                if (playlist.size() == 0)
                     Toast.makeText(getApplicationContext(), getString(R.string.warn_empty_playlist), Toast.LENGTH_SHORT).show();
-                }
                 else {
                     playlist.shuffle();
                     playlist.setCurrentIndex(0);
@@ -219,14 +206,11 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             if(data.getClipData() != null) {
                 int count = data.getClipData().getItemCount();
                 int currentItem = 0;
-                while (currentItem < count) {
-                    uris.add(data.getClipData().getItemAt(currentItem).getUri());
-                    currentItem ++;
-                }
+                while (currentItem < count)
+                    uris.add(data.getClipData().getItemAt(currentItem++).getUri());
             }
-            else if (data.getData() != null) {
+            else if (data.getData() != null)
                 uris.add(data.getData());
-            }
 
             for (Uri fileUri : uris) {
                 String name = UriUtility.getFileName(fileUri, getContentResolver());
@@ -244,9 +228,8 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
                     }
                 });
 
-                if (id == -1) {
+                if (id == -1)
                     Toast.makeText(getApplicationContext(), getString(R.string.err_general), Toast.LENGTH_LONG).show();
-                }
                 else {
                     music.setId(id);
                     listAdapter.add(music);
@@ -258,11 +241,9 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
     @Override
     public void updateFromDialog(int pos, @NonNull UpdatableFromDialog.UpdateType type) {
-        if (type == UpdateType.EDIT) {
+        if (type == UpdateType.EDIT)
             listAdapter.notifyItemChanged(pos);
-        }
-        else if (type == UpdateType.DELETE) {
+        else if (type == UpdateType.DELETE)
             listAdapter.notifyItemRemoved(pos);
-        }
     }
 }

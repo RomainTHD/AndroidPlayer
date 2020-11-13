@@ -62,8 +62,7 @@ public class ImageFromURLTask extends AsyncTask<String, Void, Bitmap> {
      */
     @Override
     protected void onPostExecute(@Nullable Bitmap bitmap) {
-        if (bitmap != null) {
+        if (bitmap != null)
             music.setPicture(bitmap);
-        }
     }
 }

@@ -47,9 +47,8 @@ public abstract class JSONFileStorage<T> extends FileStorage<T> {
         try {
             Iterator<String> iterator = json.getJSONObject(LIST).keys();
 
-            while (iterator.hasNext()) {
+            while (iterator.hasNext())
                 list.add(jsonObjectToObject(json.getJSONObject(LIST).getJSONObject(iterator.next())));
-            }
         }
         catch (JSONException e) {
             e.printStackTrace();

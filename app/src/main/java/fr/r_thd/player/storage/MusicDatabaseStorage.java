@@ -95,7 +95,7 @@ public class MusicDatabaseStorage extends DatabaseStorage<Music> {
     @NonNull
     @Override
     public List<Music> findAll() {
-        Log.e("test", "test");
+        // N'est pas vraiment supposé être exécuté
         return super.findAll();
     }
 
@@ -111,9 +111,8 @@ public class MusicDatabaseStorage extends DatabaseStorage<Music> {
                 null,
                 null
         );
-        while (cursor.moveToNext()) {
+        while (cursor.moveToNext())
             list.add(cursorToObject(cursor));
-        }
         cursor.close();
         return list;
     }

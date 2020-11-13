@@ -63,12 +63,11 @@ public abstract class DatabaseStorage<T> implements Storage<T> {
 
     @Override
     public int insert(@NonNull T object) {
-        long id = helper.getWritableDatabase().insert(
+        return (int) helper.getWritableDatabase().insert(
                 table,
                 null,
                 objectToContentValues(-1, object)
         );
-        return (int) id;
     }
 
     @Override
@@ -84,9 +83,8 @@ public abstract class DatabaseStorage<T> implements Storage<T> {
                 null,
                 null
         );
-        while (cursor.moveToNext()) {
+        while (cursor.moveToNext())
             list.add(cursorToObject(cursor));
-        }
         cursor.close();
         return list;
     }
@@ -94,7 +92,6 @@ public abstract class DatabaseStorage<T> implements Storage<T> {
     @Override
     @Nullable
     public T find(int id) {
-        T object = null;
         Cursor cursor = helper.getReadableDatabase().query(
                 table,
                 null,
@@ -104,9 +101,7 @@ public abstract class DatabaseStorage<T> implements Storage<T> {
                 null,
                 null
         );
-        if (cursor.moveToNext()) {
-            object = cursorToObject(cursor);
-        }
+        T object = cursor.moveToNext() ? cursorToObject(cursor) : null;
         cursor.close();
         return object;
     }
@@ -129,18 +124,16 @@ public abstract class DatabaseStorage<T> implements Storage<T> {
 
     @Override
     public boolean update(int id, @NonNull T object) {
-        int nb = helper.getWritableDatabase().update(
+        return helper.getWritableDatabase().update(
                 table,
                 objectToContentValues(id, object),
                 BaseColumns._ID + " = ?",
                 new String[]{"" + id}
-        );
-        return (nb != 0);
+        ) != 0;
     }
 
     @Override
     public boolean delete(int id) {
-        int nb = helper.getWritableDatabase().delete(table, BaseColumns._ID + " = ?", new String[]{"" + id});
-        return (nb != 0);
+        return (helper.getWritableDatabase().delete(table, BaseColumns._ID + " = ?", new String[]{"" + id})) != 0;
     }
 }

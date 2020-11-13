@@ -12,8 +12,8 @@ import java.io.OutputStreamWriter;
 public abstract class FileStorage<T> implements Storage<T> {
     private static final String PREFIX = "storage_";
 
-    private Context context;
-    private String fileName;
+    private final Context context;
+    private final String fileName;
 
     public FileStorage(Context context, String name, String extension) {
         this.context = context;
@@ -35,9 +35,8 @@ public abstract class FileStorage<T> implements Storage<T> {
                 String tmp;
                 StringBuilder builder = new StringBuilder();
 
-                while ((tmp = bufferedReader.readLine()) != null) {
+                while ((tmp = bufferedReader.readLine()) != null)
                     builder.append(tmp);
-                }
 
                 in.close();
                 initialize(builder.toString());

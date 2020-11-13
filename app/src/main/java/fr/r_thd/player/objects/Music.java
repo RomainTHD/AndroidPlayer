@@ -76,9 +76,8 @@ public class Music {
         this.uri = uri;
         this.picture = null;
 
-        if (imageBase64 == null) {
+        if (imageBase64 == null)
             setTitle(title);
-        }
         else {
             final byte[] decodedBytes = Base64.decode(imageBase64, Base64.DEFAULT);
             this.picture = BitmapFactory.decodeByteArray(decodedBytes, 0, decodedBytes.length);
@@ -148,9 +147,8 @@ public class Music {
     public void setPicture(@NonNull Bitmap picture) {
         this.picture = picture;
 
-        if (listener != null) {
+        if (listener != null)
             listener.onBitmapUpdate();
-        }
     }
 
     /**
@@ -158,9 +156,8 @@ public class Music {
      */
     @Nullable
     public String getBase64Picture() {
-        if (picture == null) {
+        if (picture == null)
             return null;
-        }
 
         String res = null;
 

@@ -55,16 +55,14 @@ public class Playlist {
      * @param musicList Liste de musiques
      */
     public Playlist(int id, @NonNull String name, @NonNull List<Music> musicList) {
-        // TODO: set directement à musicList ?
         this.content = new ArrayList<>();
         this.indexes = new ArrayList<>();
         this.currentIndex = 0;
         this.name = name;
         this.id = id;
 
-        for (Music music : musicList) {
+        for (Music music : musicList)
             add(music);
-        }
     }
 
     /**
@@ -184,9 +182,7 @@ public class Playlist {
      * @return Index random
      */
     public int getRandomIndex() {
-        Random r = new Random();
-        int i = r.nextInt(size());
-        return indexes.get(i);
+        return indexes.get(new Random().nextInt(size()));
     }
 
     /**

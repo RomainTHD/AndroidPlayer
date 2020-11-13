@@ -70,7 +70,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
             });
 
             ImageView deleteButton = itemView.findViewById(R.id.item_delete_button);
-            deleteButton.setOnClickListener(new View.OnClickListener() {
+            deleteButton.setOnClickListener( new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     listener.onDeleteButtonClick(musicAdapter.getTruePos(getAdapterPosition()));
@@ -114,17 +114,12 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
             protected FilterResults performFiltering(CharSequence constraint) {
                 List<Music> filteredList = new ArrayList<>();
 
-                if (constraint == null || constraint.length() == 0) {
+                if (constraint == null || constraint.length() == 0)
                     filteredList.addAll(playlistFull);
-                }
-                else {
-                    String filterPattern = constraint.toString().toLowerCase().trim();
-                    for (Music music : playlistFull) {
-                        if (music.getTitle().toLowerCase().contains(filterPattern)) {
+                else
+                    for (Music music : playlistFull)
+                        if (music.getTitle().toLowerCase().contains(constraint.toString().toLowerCase().trim()))
                             filteredList.add(music);
-                        }
-                    }
-                }
 
                 FilterResults results = new FilterResults();
                 results.values = filteredList;

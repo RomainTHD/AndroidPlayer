@@ -69,16 +69,14 @@ public class GifView extends View {
         canvas.drawColor(0x00000000);
 
         long now = android.os.SystemClock.uptimeMillis();
-        if (movieStart == 0) { // Début
+        if (movieStart == 0) // Début
             movieStart = now;
-        }
 
         if (movie != null) {
             int dur = movie.duration();
 
-            if (dur == 0) {
+            if (dur == 0)
                 dur = 1000;
-            }
 
             int relTime = (int) ((now - movieStart) % dur);
             movie.setTime(relTime);
