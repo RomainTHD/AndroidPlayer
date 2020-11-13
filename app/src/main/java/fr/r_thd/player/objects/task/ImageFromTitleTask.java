@@ -51,7 +51,7 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
         String title = titles[0];
-        String apiKey = API.API_KEY.replace('_', 'a');
+        String apiKey = API.API_KEY.replace('_', 'i');
 
         try {
             URL url = new URL("https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + title + "&relevanceLanguage=fr-FR&type=video&key=" + apiKey);
@@ -65,10 +65,9 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
             StringBuilder buffer = new StringBuilder();
             String line;
 
-            while ((line = reader.readLine()) != null) {
+            while ((line = reader.readLine()) != null)
                 buffer.append(line).append("\n");
                 // Log.d("Response", "> " + line); // Full response
-            }
 
             return buffer.toString();
         }
@@ -76,13 +75,12 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
         finally {
-            if (connection != null) {
+            if (connection != null)
                 connection.disconnect();
-            }
+
             try {
-                if (reader != null) {
+                if (reader != null)
                     reader.close();
-                }
             }
             catch (IOException e) {
                 e.printStackTrace();
@@ -99,9 +97,8 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
      */
     @Override
     protected void onPostExecute(@Nullable String JSONString) {
-        if (JSONString == null) {
+        if (JSONString == null)
             return;
-        }
 
         String url = null;
 
@@ -127,8 +124,7 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
             e.printStackTrace();
         }
 
-        if (url != null) {
+        if (url != null)
             new ImageFromURLTask(this.music).execute(url);
-        }
     }
 }
