@@ -3,9 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.PlaylistActivity">
+    tools:context=".activity.PlaylistActivity"
+    android:background="@color/colorBackground">
 
     <LinearLayout
+        android:layout_marginTop="@dimen/playlist_margin_top"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
@@ -24,10 +26,10 @@
                 android:id="@+id/no_result"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="16sp"
-                android:padding="20dp"
-                android:paddingStart="40dp"
-                android:paddingEnd="40dp"
+                android:textSize="@dimen/no_result_text_size"
+                android:padding="@dimen/no_result_padding"
+                android:paddingStart="@dimen/no_result_padding_side"
+                android:paddingEnd="@dimen/no_result_padding_side"
                 android:text="@string/no_result" />
         </LinearLayout>
 
@@ -49,7 +51,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|start"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/floating_button_side_offset"
         android:tint="@android:color/white"
         android:src="@drawable/ic_shuffle"
         android:contentDescription="@string/desc_shuffle_button" />
@@ -59,7 +61,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/floating_button_side_offset"
         android:tint="@android:color/white"
         android:src="@drawable/ic_add"
         android:contentDescription="@string/desc_add_button" />

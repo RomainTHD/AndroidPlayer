@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.HomeActivity">
+    tools:context=".activity.HomeActivity"
+    android:background="@color/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,33 +13,20 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="@dimen/home_logo_height"
             android:orientation="horizontal">
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:visibility="invisible"/>
 
             <fr.r_thd.player.view.GifView
                 android:id="@+id/logo"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:layout_weight="0.5"
                 tools:src="@tools:sample/avatars"
                 android:contentDescription="@string/desc_home_picture" />
-
-            <View
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="2"
-                android:visibility="invisible"/>
         </LinearLayout>
 
         <View
             android:layout_width="match_parent"
-            android:layout_height="1dp"
+            android:layout_height="@dimen/list_divider"
             android:background="?android:attr/listDivider" />
 
         <LinearLayout
@@ -56,10 +43,10 @@
                 android:id="@+id/no_result"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:textSize="16sp"
-                android:padding="20dp"
-                android:paddingStart="40dp"
-                android:paddingEnd="40dp"
+                android:textSize="@dimen/no_result_text_size"
+                android:padding="@dimen/no_result_padding"
+                android:paddingStart="@dimen/no_result_padding_side"
+                android:paddingEnd="@dimen/no_result_padding_side"
                 android:text="@string/no_result" />
         </LinearLayout>
 
@@ -80,7 +67,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_margin="16dp"
+        android:layout_margin="@dimen/floating_button_side_offset"
         android:tint="@android:color/white"
         android:src="@drawable/ic_add"
         android:contentDescription="@string/desc_add_button" />

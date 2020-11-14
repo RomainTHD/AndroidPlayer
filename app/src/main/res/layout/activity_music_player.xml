@@ -4,7 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activity.MusicPlayerActivity">
+    tools:context=".activity.MusicPlayerActivity"
+    android:background="@color/colorBackground">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,24 +16,27 @@
             android:id="@+id/music_title"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:textFontWeight="30"
+            android:textStyle="bold"
+            android:textSize="@dimen/music_title_text_size"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:padding="20dp" />
+            android:paddingTop="@dimen/music_title_padding"
+            android:paddingLeft="@dimen/music_title_padding"
+            android:paddingRight="@dimen/music_title_padding" />
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="300dp"
+            android:layout_height="@dimen/music_preview_height"
             android:orientation="vertical"
             android:baselineAligned="false">
 
             <ImageView
                 android:id="@+id/music_picture_id"
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginLeft="20dp"
-                android:layout_marginRight="20dp"
-                android:layout_marginBottom="10dp"
-                android:layout_weight="1"
+                android:layout_height="@dimen/auto"
+                android:layout_marginLeft="@dimen/music_preview_margin"
+                android:layout_marginRight="@dimen/music_preview_margin"
+                android:layout_marginBottom="@dimen/music_preview_margin_bottom"
+                android:layout_weight="@integer/music_preview_weight"
                 android:src="@drawable/ic_no_preview"
                 android:contentDescription="@string/desc_player_picture" />
 
@@ -42,21 +46,21 @@
                 android:orientation="horizontal">
 
                 <View
-                    android:layout_width="20dp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.5"
+                    android:layout_width="@dimen/auto"
+                    android:layout_height="@dimen/auto"
+                    android:layout_weight="@integer/seekbar_side_weight"
                     android:visibility="invisible"/>
 
                 <SeekBar
                     android:id="@+id/volume_seek_bar"
                     android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1" />
+                    android:layout_height="wrap_content"
+                    android:layout_weight="@integer/seekbar_weight" />
 
                 <View
-                    android:layout_width="0dp"
-                    android:layout_height="20dp"
-                    android:layout_weight="0.5"
+                    android:layout_width="@dimen/auto"
+                    android:layout_height="@dimen/auto"
+                    android:layout_weight="@integer/seekbar_side_weight"
                     android:visibility="invisible"/>
             </LinearLayout>
         </LinearLayout>
@@ -65,12 +69,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:baselineAligned="false">
+            android:baselineAligned="false"
+            android:layout_marginTop="@dimen/previous_next_buttons_margin_top">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="@integer/previous_next_side_weight"
                 android:orientation="vertical">
 
                 <Button
@@ -86,23 +91,23 @@
                     android:layout_width="wrap_content"
                     android:layout_height="match_parent"
                     android:layout_gravity="start"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
+                    android:paddingStart="@dimen/previous_next_padding"
+                    android:paddingEnd="@dimen/previous_next_padding"
                     android:ellipsize="end"
-                    android:maxLength="24"
-                    android:maxLines="1" />
+                    android:maxLength="@integer/previous_next_max_length"
+                    android:maxLines="@integer/previous_next_max_lines" />
             </LinearLayout>
 
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:layout_weight="1.25" />
+                android:layout_weight="@integer/previous_next_center_weight" />
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
+                android:layout_weight="@integer/previous_next_side_weight"
                 android:orientation="vertical">
 
                 <Button
@@ -119,11 +124,11 @@
                     android:layout_height="match_parent"
                     android:layout_gravity="end"
                     android:gravity="end"
-                    android:paddingStart="10dp"
-                    android:paddingEnd="10dp"
+                    android:paddingStart="@dimen/previous_next_padding"
+                    android:paddingEnd="@dimen/previous_next_padding"
                     android:ellipsize="end"
-                    android:maxLength="24"
-                    android:maxLines="1" />
+                    android:maxLength="@integer/previous_next_max_length"
+                    android:maxLines="@integer/previous_next_max_lines" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -133,7 +138,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|center"
-        android:layout_margin="56dp"
+        android:layout_margin="@dimen/floating_button_center_offset"
         android:tint="@android:color/white"
         android:src="@drawable/ic_play"
         android:contentDescription="@string/desc_pause_button" />

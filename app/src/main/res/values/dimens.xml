@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="home_logo_height">200dp</dimen>
+    <dimen name="list_divider">1dp</dimen>
+
+    <dimen name="no_result_text_size">16sp</dimen>
+    <dimen name="no_result_padding">20dp</dimen>
+    <dimen name="no_result_padding_side">40dp</dimen>
+
+    <dimen name="floating_button_side_offset">16dp</dimen>
+    <dimen name="floating_button_center_offset">56dp</dimen>
+
+    <dimen name="music_title_text_size">24sp</dimen>
+    <dimen name="music_title_padding">20dp</dimen>
+
+    <dimen name="music_preview_height">300dp</dimen>
+    <dimen name="music_preview_margin">20dp</dimen>
+    <dimen name="music_preview_margin_bottom">5dp</dimen>
+    <item name="music_preview_weight" type="integer">1</item>
+
+    <item name="seekbar_weight" type="integer">1</item>
+    <item name="seekbar_side_weight" type="integer">0.5</item>
+
+    <dimen name="previous_next_buttons_margin_top">10dp</dimen>
+    <item name="previous_next_side_weight" type="integer">1</item>
+    <item name="previous_next_center_weight" type="integer">1.25</item>
+    <dimen name="previous_next_padding">10dp</dimen>
+    <item name="previous_next_max_length" type="integer">24</item>
+    <item name="previous_next_max_lines" type="integer">1</item>
+
+    <dimen name="playlist_margin_top">30dp</dimen>
+
+    <dimen name="item_list_image_margin">5dp</dimen>
+    <item name="item_list_image_weight" type="integer">1.25</item>
+    <dimen name="item_list_text_margin">15dp</dimen>
+    <dimen name="item_list_text_size">20sp</dimen>
+    <item name="item_list_text_weight" type="integer">0.5</item>
+    <dimen name="item_list_button_padding">5dp</dimen>
+    <item name="item_list_button_weight" type="integer">1.3</item>
+
+    <dimen name="auto">0dp</dimen>
+</resources>
