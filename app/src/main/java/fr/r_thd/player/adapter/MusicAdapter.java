@@ -139,7 +139,7 @@ public class MusicAdapter extends RecyclerView.Adapter<MusicAdapter.MusicHolder>
     @Override
     public MusicAdapter.MusicHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_playlist_elem, parent, false);
+                .inflate(R.layout.item_list, parent, false);
 
         view.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
