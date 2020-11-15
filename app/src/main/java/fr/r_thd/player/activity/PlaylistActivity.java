@@ -7,6 +7,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -18,7 +19,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import fr.r_thd.player.R;
-import fr.r_thd.player.adapter.MusicAdapter;
+import fr.r_thd.player.adapter.ListAdapter;
 import fr.r_thd.player.adapter.AdapterListener;
 import fr.r_thd.player.dialog.MusicDeleteDialog;
 import fr.r_thd.player.dialog.MusicEditDialog;
@@ -45,7 +46,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
     /**
      * Adapter
      */
-    private MusicAdapter listAdapter;
+    private ListAdapter<Music> listAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,7 +90,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
     private void buildRecyclerView() {
         final RecyclerView list = findViewById(R.id.playlist);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        listAdapter = new MusicAdapter(playlist.getArray(), new AdapterListener() {
+        listAdapter = new ListAdapter<>(playlist.getArray(), new AdapterListener<Music>() {
             @Override
             public void onLongClick() {
                 Toast.makeText(getApplicationContext(), getString(R.string.hint_detail_playlist), Toast.LENGTH_SHORT).show();
@@ -111,6 +112,21 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             @Override
             public void onDeleteButtonClick(int pos) {
                 new MusicDeleteDialog(PlaylistActivity.this, playlist, listAdapter, pos).show(getSupportFragmentManager(), "");
+            }
+
+            @Override
+            public boolean containsFilter(Music elem, String filter) {
+                return elem.getTitle().toLowerCase().contains(filter);
+            }
+
+            @Override
+            public String getTitle(Music elem) {
+                return elem.getTitle();
+            }
+
+            @Override
+            public Bitmap getPreview(Music elem) {
+                return elem.getPicture();
             }
         });
 
@@ -216,24 +232,28 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
                 String name = UriUtility.getFileName(fileUri, getContentResolver());
                 String path = fileUri.toString();
 
-                final Music music = new Music(playlist.getId(), name, path);
-
-                final int id = MusicDatabaseStorage.get(getApplicationContext()).insert(music);
-
-                music.setOnBitmapUpdateListener(new OnBitmapUpdateListener() {
-                    @Override
-                    public void onBitmapUpdate() {
-                        listAdapter.notifyDataSetChanged();
-                        MusicDatabaseStorage.get(getApplicationContext()).update(id, music);
-                    }
-                });
-
-                if (id == -1)
-                    Toast.makeText(getApplicationContext(), getString(R.string.err_general), Toast.LENGTH_LONG).show();
+                if (name.isEmpty())
+                    Toast.makeText(getApplicationContext(), getString(R.string.warn_empty_name), Toast.LENGTH_SHORT).show();
                 else {
-                    music.setId(id);
-                    listAdapter.add(music);
-                    listAdapter.notifyItemInserted(playlist.size() - 1);
+                    final Music music = new Music(playlist.getId(), name, path);
+
+                    final int id = MusicDatabaseStorage.get(getApplicationContext()).insert(music);
+
+                    music.setOnBitmapUpdateListener(new OnBitmapUpdateListener() {
+                        @Override
+                        public void onBitmapUpdate() {
+                            listAdapter.notifyDataSetChanged();
+                            MusicDatabaseStorage.get(getApplicationContext()).update(id, music);
+                        }
+                    });
+
+                    if (id == -1)
+                        Toast.makeText(getApplicationContext(), getString(R.string.err_general), Toast.LENGTH_LONG).show();
+                    else {
+                        music.setId(id);
+                        listAdapter.add(music);
+                        listAdapter.notifyItemInserted(playlist.size() - 1);
+                    }
                 }
             }
         }

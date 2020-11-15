@@ -12,7 +12,7 @@ import androidx.fragment.app.DialogFragment;
 import java.util.List;
 
 import fr.r_thd.player.R;
-import fr.r_thd.player.adapter.PlaylistAdapter;
+import fr.r_thd.player.adapter.ListAdapter;
 import fr.r_thd.player.objects.Music;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
@@ -38,7 +38,7 @@ public class PlaylistDeleteDialog extends DialogFragment {
      * Adapter
      */
     @NonNull
-    private final PlaylistAdapter adapter;
+    private final ListAdapter<Playlist> adapter;
 
     /**
      * Position
@@ -53,7 +53,7 @@ public class PlaylistDeleteDialog extends DialogFragment {
      * @param adapter Adapter
      * @param pos Position
      */
-    public PlaylistDeleteDialog(@NonNull UpdatableFromDialog updatable, @NonNull List<Playlist> playlistList, @NonNull PlaylistAdapter adapter, int pos) {
+    public PlaylistDeleteDialog(@NonNull UpdatableFromDialog updatable, @NonNull List<Playlist> playlistList, @NonNull ListAdapter<Playlist> adapter, int pos) {
         this.updatable = updatable;
         this.playlistList = playlistList;
         this.adapter = adapter;

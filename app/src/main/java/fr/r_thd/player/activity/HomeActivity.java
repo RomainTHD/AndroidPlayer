@@ -9,6 +9,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.text.InputType;
 import android.view.View;
@@ -21,7 +22,7 @@ import java.util.List;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.adapter.AdapterListener;
-import fr.r_thd.player.adapter.PlaylistAdapter;
+import fr.r_thd.player.adapter.ListAdapter;
 import fr.r_thd.player.dialog.PlaylistDeleteDialog;
 import fr.r_thd.player.dialog.PlaylistEditDialog;
 import fr.r_thd.player.dialog.UpdatableFromDialog;
@@ -41,7 +42,7 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
     /**
      * Adapter de la liste des playlist
      */
-    private PlaylistAdapter playlistAdapter;
+    private ListAdapter<Playlist> playlistAdapter;
 
     /**
      * Liste des playlist
@@ -67,6 +68,7 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
         buildRecyclerView();
         bindButtons();
 
+        // Searchview, gestion de la query
         SearchView searchView = findViewById(R.id.search_bar_playlist);
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -90,7 +92,7 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
         final RecyclerView list = findViewById(R.id.playlist_list);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
 
-        playlistAdapter = new PlaylistAdapter(playlistList, new AdapterListener() {
+        playlistAdapter = new ListAdapter<>(playlistList, new AdapterListener<Playlist>() {
             @Override
             public void onLongClick() {
                 Toast.makeText(getApplicationContext(), "Détails d'une playlist", Toast.LENGTH_SHORT).show();
@@ -113,8 +115,24 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
             public void onDeleteButtonClick(int pos) {
                 new PlaylistDeleteDialog(HomeActivity.this, playlistList, playlistAdapter, pos).show(getSupportFragmentManager(), "");
             }
+
+            @Override
+            public boolean containsFilter(Playlist elem, String filter) {
+                return elem.getName().toLowerCase().contains(filter);
+            }
+
+            @Override
+            public String getTitle(Playlist elem) {
+                return elem.getName();
+            }
+
+            @Override
+            public Bitmap getPreview(Playlist elem) {
+                return null;
+            }
         });
 
+        // Gestion dynamique du message "pas de résultats"
         playlistAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeChanged(int positionStart, int itemCount) {
@@ -150,12 +168,10 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
             public void onChanged() {
                 super.onChanged();
                 View noResultView = findViewById(R.id.no_result);
-                if (playlistAdapter.getItemCount() == 0) {
+                if (playlistAdapter.getItemCount() == 0)
                     noResultView.getLayoutParams().height = LinearLayout.LayoutParams.MATCH_PARENT;
-                }
-                else {
+                else
                     noResultView.getLayoutParams().height = 0;
-                }
                 noResultView.requestLayout();
             }
         });
@@ -164,6 +180,7 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
     }
 
     private void bindButtons() {
+        // À l'époque je ne connaissais pas encore les dialogs en fragment donc voilà
         findViewById(R.id.button_create).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -215,11 +232,9 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
 
     @Override
     public void updateFromDialog(int pos, @NonNull UpdatableFromDialog.UpdateType type) {
-        if (type == UpdateType.EDIT) {
+        if (type == UpdateType.EDIT)
             playlistAdapter.notifyItemChanged(pos);
-        }
-        else if (type == UpdateType.DELETE) {
+        else if (type == UpdateType.DELETE)
             playlistAdapter.notifyItemRemoved(pos);
-        }
     }
 }

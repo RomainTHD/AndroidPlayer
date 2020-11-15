@@ -10,7 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
 import fr.r_thd.player.R;
-import fr.r_thd.player.adapter.MusicAdapter;
+import fr.r_thd.player.adapter.ListAdapter;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
 
@@ -34,7 +34,7 @@ public class MusicDeleteDialog extends DialogFragment {
      * Adapter
      */
     @NonNull
-    private final MusicAdapter adapter;
+    private final ListAdapter adapter;
 
     /**
      * Position
@@ -49,7 +49,7 @@ public class MusicDeleteDialog extends DialogFragment {
      * @param adapter Adapter
      * @param pos Position
      */
-    public MusicDeleteDialog(@NonNull UpdatableFromDialog updatable, @NonNull Playlist playlist, @NonNull MusicAdapter adapter, int pos) {
+    public MusicDeleteDialog(@NonNull UpdatableFromDialog updatable, @NonNull Playlist playlist, @NonNull ListAdapter adapter, int pos) {
         this.updatable = updatable;
         this.playlist = playlist;
         this.adapter = adapter;
