@@ -46,7 +46,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
     /**
      * Adapter
      */
-    private ListAdapter<Music> listAdapter;
+    private ListAdapter<Music> musicAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,18 +79,21 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                listAdapter.getFilter().filter(newText);
+                musicAdapter.getFilter().filter(newText);
                 return true;
             }
         });
 
-        listAdapter.notifyDataSetChanged();
+        musicAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Crée la recyclerview
+     */
     private void buildRecyclerView() {
         final RecyclerView list = findViewById(R.id.playlist);
         list.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
-        listAdapter = new ListAdapter<>(playlist.getArray(), new AdapterListener<Music>() {
+        musicAdapter = new ListAdapter<>(playlist.getArray(), new AdapterListener<Music>() {
             @Override
             public void onLongClick() {
                 Toast.makeText(getApplicationContext(), getString(R.string.hint_detail_playlist), Toast.LENGTH_SHORT).show();
@@ -111,7 +114,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
 
             @Override
             public void onDeleteButtonClick(int pos) {
-                new MusicDeleteDialog(PlaylistActivity.this, playlist, listAdapter, pos).show(getSupportFragmentManager(), "");
+                new MusicDeleteDialog(PlaylistActivity.this, playlist, musicAdapter, pos).show(getSupportFragmentManager(), "");
             }
 
             @Override
@@ -130,7 +133,8 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             }
         });
 
-        listAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
+        // Gestion dynamique du message "pas de résultats"
+        musicAdapter.registerAdapterDataObserver(new RecyclerView.AdapterDataObserver() {
             @Override
             public void onItemRangeChanged(int positionStart, int itemCount) {
                 super.onItemRangeChanged(positionStart, itemCount);
@@ -165,12 +169,12 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
             public void onChanged() {
                 super.onChanged();
                 View noResultView = findViewById(R.id.no_result);
-                noResultView.getLayoutParams().height = (listAdapter.getItemCount() == 0) ? LinearLayout.LayoutParams.MATCH_PARENT : 0;
+                noResultView.getLayoutParams().height = (musicAdapter.getItemCount() == 0) ? LinearLayout.LayoutParams.MATCH_PARENT : 0;
                 noResultView.requestLayout();
             }
         });
 
-        list.setAdapter(listAdapter);
+        list.setAdapter(musicAdapter);
     }
 
     private void bindButtons() {
@@ -210,6 +214,14 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
                 startActivityForResult(Intent.createChooser(intent, getString(R.string.chooser_music_title)), REQUEST_GET_FILE);
             }
         });
+
+        findViewById(R.id.button_add).setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+                Toast.makeText(getApplicationContext(), getString(R.string.hint_add_music), Toast.LENGTH_SHORT).show();
+                return true;
+            }
+        });
     }
 
     @Override
@@ -217,15 +229,18 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == REQUEST_GET_FILE && resultCode == RESULT_OK && data != null) {
+            // Liste des URIs sélectionnées
             List<Uri> uris = new ArrayList<>();
 
             if(data.getClipData() != null) {
+                // Sélection multiple
                 int count = data.getClipData().getItemCount();
                 int currentItem = 0;
                 while (currentItem < count)
                     uris.add(data.getClipData().getItemAt(currentItem++).getUri());
             }
             else if (data.getData() != null)
+                // Sélection unique
                 uris.add(data.getData());
 
             for (Uri fileUri : uris) {
@@ -242,7 +257,7 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
                     music.setOnBitmapUpdateListener(new OnBitmapUpdateListener() {
                         @Override
                         public void onBitmapUpdate() {
-                            listAdapter.notifyDataSetChanged();
+                            musicAdapter.notifyDataSetChanged();
                             MusicDatabaseStorage.get(getApplicationContext()).update(id, music);
                         }
                     });
@@ -251,8 +266,9 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
                         Toast.makeText(getApplicationContext(), getString(R.string.err_general), Toast.LENGTH_LONG).show();
                     else {
                         music.setId(id);
-                        listAdapter.add(music);
-                        listAdapter.notifyItemInserted(playlist.size() - 1);
+                        musicAdapter.add(music);
+                        playlist.add(null);
+                        musicAdapter.notifyItemInserted(playlist.size() - 1);
                     }
                 }
             }
@@ -262,8 +278,8 @@ public class PlaylistActivity extends AppCompatActivity implements UpdatableFrom
     @Override
     public void updateFromDialog(int pos, @NonNull UpdatableFromDialog.UpdateType type) {
         if (type == UpdateType.EDIT)
-            listAdapter.notifyItemChanged(pos);
+            musicAdapter.notifyItemChanged(pos);
         else if (type == UpdateType.DELETE)
-            listAdapter.notifyItemRemoved(pos);
+            musicAdapter.notifyItemRemoved(pos);
     }
 }

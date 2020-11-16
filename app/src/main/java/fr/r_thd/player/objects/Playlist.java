@@ -1,6 +1,9 @@
 package fr.r_thd.player.objects;
 
+import android.util.Log;
+
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -86,8 +89,9 @@ public class Playlist {
      *
      * @param m Musique
      */
-    public void add(@NonNull Music m) {
-        content.add(m);
+    public void add(@Nullable Music m) {
+        if (m != null)
+            content.add(m);
         indexes.add(indexes.size());
     }
 
