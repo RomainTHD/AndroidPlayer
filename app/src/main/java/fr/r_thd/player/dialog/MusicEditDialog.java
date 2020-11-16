@@ -6,6 +6,7 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -62,8 +63,12 @@ public class MusicEditDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         Music music = getMusicFromView(view);
-                        MusicDatabaseStorage.get(getContext()).update(music.getId(), music);
-                        updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.EDIT);
+                        if (music.getTitle().isEmpty())
+                            Toast.makeText(getContext(), getString(R.string.warn_empty_name), Toast.LENGTH_SHORT).show();
+                        else {
+                            MusicDatabaseStorage.get(getContext()).update(music.getId(), music);
+                            updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.EDIT);
+                        }
                     }
                 })
                 .setNegativeButton(R.string.cancel, null)
