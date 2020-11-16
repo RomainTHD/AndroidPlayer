@@ -38,6 +38,21 @@ public abstract class UriUtility {
                 result = result.substring(cut + 1);
         }
 
-        return result;
+        // Suppression du ".mp3"
+        String[] nameSplit = result.split("\\.");
+        StringBuilder resultBuilder = new StringBuilder();
+
+        if (nameSplit.length == 1)
+            resultBuilder.append(nameSplit[0]);
+        else {
+            for (int i = 0; i < nameSplit.length - 1; i++) {
+                resultBuilder.append(nameSplit[i]);
+
+                if (i != nameSplit.length - 2)
+                    resultBuilder.append('.');
+            }
+        }
+
+        return resultBuilder.toString().trim();
     }
 }
