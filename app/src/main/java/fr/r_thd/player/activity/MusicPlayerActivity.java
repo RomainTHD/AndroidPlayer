@@ -3,6 +3,7 @@ package fr.r_thd.player.activity;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.NotificationManager;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.widget.Toast;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import fr.r_thd.player.R;
+import fr.r_thd.player.notification.MusicPlayerNotification;
 import fr.r_thd.player.objects.Music;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.service.MusicPlayerService;
@@ -32,11 +34,32 @@ import fr.r_thd.player.storage.PlaylistDatabaseStorage;
  * Activité de player de musique
  */
 public class MusicPlayerActivity extends AppCompatActivity {
+    /**
+     * ID de la musique actuelle
+     */
     public static final String EXTRA_CURRENT_PLAYLIST_ID = "EXTRA_CURRENT_PLAYLIST";
+
+    /**
+     * Index de la musique actuelle
+     */
     public static final String EXTRA_SELECTED_MUSIC_INDEX = "EXTRA_SELECTED_MUSIC_INDEX";
+
+    /**
+     * Doit autoplay ou non
+     */
     public static final String EXTRA_SHOULD_PLAY =  "EXTRA_SHOULD_PLAY";
 
+    /**
+     * Request de storage externe
+     */
     public static final int REQUEST_EXTERNAL_STORAGE = 12345;
+
+    /**
+     * Action à faire lors du resume, utile pour les notifications
+     */
+    private static String actionToDoOnResume = null;
+
+    ////////////////////////////////////////////////////////////////////////////////////////////////
 
     /**
      * Playlist
@@ -68,6 +91,19 @@ public class MusicPlayerActivity extends AppCompatActivity {
      */
     private boolean shouldPlay;
 
+    /**
+     * Bouton de pause
+     */
+    private FloatingActionButton playPauseButton;
+
+    /**
+     * Notification de musique
+     */
+    private MusicPlayerNotification musicPlayerNotification;
+
+    /**
+     * Création
+     */
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,22 +138,21 @@ public class MusicPlayerActivity extends AppCompatActivity {
         ((TextView) findViewById(R.id.title_previous)).setText(playlist.getPrevious().getTitle());
 
         Bitmap bitmap = music.getPicture();
-        if (bitmap != null) {
+        if (bitmap != null)
             ((ImageView) findViewById(R.id.music_picture_id)).setImageBitmap(bitmap);
-        }
 
         bindButtons();
 
-        Object shouldPlayObj = getIntent()
-                .getSerializableExtra(EXTRA_SHOULD_PLAY);
+        Object shouldPlayObj = getIntent().getSerializableExtra(EXTRA_SHOULD_PLAY);
 
         shouldPlay = false;
-
-        if (shouldPlayObj != null) {
+        if (shouldPlayObj != null)
             shouldPlay = (Boolean) shouldPlayObj;
-        }
     }
 
+    /**
+     * Start la musique précédente
+     */
     private void startPreviousMusic() {
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
         intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
@@ -127,6 +162,9 @@ public class MusicPlayerActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Start la musique suivante
+     */
     private void startNextMusic() {
         Intent intent = new Intent(getApplicationContext(), MusicPlayerActivity.class);
         intent.putExtra(EXTRA_CURRENT_PLAYLIST_ID, playlist.getId());
@@ -136,6 +174,23 @@ public class MusicPlayerActivity extends AppCompatActivity {
         finish();
     }
 
+    /**
+     * Met la musique actuelle en pause
+     */
+    private void pauseCurrentMusic() {
+        if (MusicPlayerService.isPlaying()) {
+            playPauseButton.setImageResource(R.drawable.ic_play);
+            musicPlayerService.pause();
+        }
+        else {
+            playPauseButton.setImageResource(R.drawable.ic_pause);
+            musicPlayerService.play();
+        }
+    }
+
+    /**
+     * Crée la barre de volume
+     */
     private void setVolumeBar() {
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
 
@@ -144,6 +199,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
         volumeSeekBar.setMax(audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC));
         volumeSeekBar.setProgress(audioManager.getStreamVolume(AudioManager.STREAM_MUSIC));
 
+        // Quand on touche la seekbar
         volumeSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
@@ -157,6 +213,7 @@ public class MusicPlayerActivity extends AppCompatActivity {
             public void onStopTrackingTouch(SeekBar seekBar) {}
         });
 
+        // Quand le volume système est changé
         volumeObserver = new ContentObserver(new Handler()) {
             @Override
             public void onChange(boolean selfChange) {
@@ -168,30 +225,22 @@ public class MusicPlayerActivity extends AppCompatActivity {
         getApplicationContext().getContentResolver().registerContentObserver(android.provider.Settings.System.CONTENT_URI, true, volumeObserver);
     }
 
+    /**
+     * Bind les boutons
+     */
     private void bindButtons() {
-        final FloatingActionButton playPauseButton = findViewById(R.id.button_play_pause);
+        playPauseButton = findViewById(R.id.button_play_pause);
         playPauseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (MusicPlayerService.isPlaying()) {
-                    playPauseButton.setImageResource(R.drawable.ic_play);
-                    musicPlayerService.pause();
-                }
-                else {
-                    playPauseButton.setImageResource(R.drawable.ic_pause);
-                    musicPlayerService.play();
-                }
+                pauseCurrentMusic();
             }
         });
 
-        if (MusicPlayerService.isPlaying()) {
+        if (MusicPlayerService.isPlaying())
             playPauseButton.setImageResource(R.drawable.ic_pause);
-        }
-        else {
+        else
             playPauseButton.setImageResource(R.drawable.ic_play);
-        }
-
-        ////////////////////////////////////////////////////////////////////////////////////////////
 
         findViewById(R.id.button_previous).setOnClickListener(new View.OnClickListener() {
             @Override
@@ -206,8 +255,19 @@ public class MusicPlayerActivity extends AppCompatActivity {
                 startNextMusic();
             }
         });
+
+        musicPlayerNotification = new MusicPlayerNotification(
+                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE),
+                getApplicationContext(),
+                getIntent(),
+                music
+        );
+        musicPlayerNotification.show();
     }
 
+    /**
+     * On start, permet de bind la connexion avec le service de musique
+     */
     @Override
     protected void onStart() {
         super.onStart();
@@ -222,31 +282,66 @@ public class MusicPlayerActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onServiceDisconnected(ComponentName name) {
-
-            }
+            public void onServiceDisconnected(ComponentName name) {}
         };
 
         Intent intent = new Intent(this, MusicPlayerService.class);
         bindService(intent, connection, Context.BIND_AUTO_CREATE);
     }
 
+    /**
+     * On post resume, permet de gérer les notifications
+     */
     @Override
-    protected void onStop() {
-        unbindService(connection);
-        getApplicationContext().getContentResolver().unregisterContentObserver(volumeObserver);
-        super.onStop();
+    protected void onPostResume() {
+        super.onPostResume();
+
+        if (actionToDoOnResume != null) {
+            switch (actionToDoOnResume) {
+                case MusicPlayerNotification.REQUEST_PREV:
+                    startPreviousMusic();
+                    break;
+
+                case MusicPlayerNotification.REQUEST_PAUSE:
+                    pauseCurrentMusic();
+                    break;
+
+                case MusicPlayerNotification.REQUEST_NEXT:
+                    startNextMusic();
+                    break;
+            }
+
+            actionToDoOnResume = null;
+        }
+
+        String action = getIntent().getStringExtra(MusicPlayerNotification.REQUEST_NAME);
+        if (action != null) {
+            actionToDoOnResume = action;
+            finish();
+        }
     }
 
+    /**
+     * À la fin de l'activité, unbind les services
+     */
     @Override
     protected void onDestroy() {
+        unbindService(connection);
+        getApplicationContext().getContentResolver().unregisterContentObserver(volumeObserver);
+        musicPlayerNotification.destroy();
         super.onDestroy();
     }
 
+    /**
+     * Quand la musique est terminée
+     */
     public void onMusicFinished() {
         startNextMusic();
     }
 
+    /**
+     * Requête de permissions
+     */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         if (requestCode == REQUEST_EXTERNAL_STORAGE) {
