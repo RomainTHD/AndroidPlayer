@@ -14,6 +14,7 @@ import androidx.fragment.app.DialogFragment;
 
 import fr.r_thd.player.R;
 import fr.r_thd.player.objects.Music;
+import fr.r_thd.player.objects.OnBitmapUpdateListener;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.MusicDatabaseStorage;
 
@@ -62,12 +63,17 @@ public class MusicEditDialog extends DialogFragment {
                 .setPositiveButton(getString(R.string.ok), new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        Music music = getMusicFromView(view);
+                        final Music music = getMusicFromView(view);
                         if (music.getTitle().isEmpty())
                             Toast.makeText(getContext(), getString(R.string.warn_empty_name), Toast.LENGTH_SHORT).show();
                         else {
-                            MusicDatabaseStorage.get(getContext()).update(music.getId(), music);
-                            updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.EDIT);
+                            music.setOnBitmapUpdateListener(new OnBitmapUpdateListener() {
+                                @Override
+                                public void onBitmapUpdate() {
+                                    MusicDatabaseStorage.get(getContext()).update(music.getId(), music);
+                                    updatable.updateFromDialog(pos, UpdatableFromDialog.UpdateType.EDIT);
+                                }
+                            });
                         }
                     }
                 })
