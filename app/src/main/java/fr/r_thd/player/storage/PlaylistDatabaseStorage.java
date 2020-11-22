@@ -13,6 +13,9 @@ import androidx.annotation.NonNull;
 import fr.r_thd.player.objects.Playlist;
 import fr.r_thd.player.storage.utility.DatabaseStorage;
 
+/**
+ * Database de playlist
+ */
 public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
     public static final String TABLE_NAME = "playlist";
 
@@ -21,12 +24,14 @@ public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
 
     private static PlaylistDatabaseStorage storage;
 
-    private static Context context;
+    /**
+     * Contexte, obligatoire pour récupérer la liste des musiques
+     */
+    private final Context context;
 
     public static PlaylistDatabaseStorage get(Context context) {
         if (storage == null) {
             storage = new PlaylistDatabaseStorage(context);
-            PlaylistDatabaseStorage.context = context;
         }
 
         return storage;
@@ -56,6 +61,7 @@ public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
 
     private PlaylistDatabaseStorage(Context context) {
         super(new DatabaseHelper(context), TABLE_NAME);
+        this.context = context;
     }
 
     @NonNull
@@ -70,7 +76,6 @@ public class PlaylistDatabaseStorage extends DatabaseStorage<Playlist> {
     @Override
     protected Playlist cursorToObject(@NonNull Cursor cursor) {
         int playlistId = cursor.getInt(COL_ID.second);
-
         return new Playlist(
                 playlistId,
                 cursor.getString(COL_NAME.second),
