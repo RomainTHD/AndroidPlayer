@@ -1,31 +1,22 @@
 package fr.r_thd.player.service;
 
-import android.Manifest;
 import android.app.Service;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Binder;
-import android.os.Environment;
 import android.os.IBinder;
-import android.util.Log;
 import android.widget.Toast;
 
-import androidx.core.content.ContextCompat;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
 import fr.r_thd.player.activity.MusicPlayerActivity;
 
 /**
  * Service de lecture de musique
  */
-public class MusicPlayerService extends Service implements
-        MediaPlayer.OnCompletionListener {
-
+public class MusicPlayerService extends Service {
     /**
      * En train de tourner ou non
      */
@@ -39,6 +30,7 @@ public class MusicPlayerService extends Service implements
     /**
      * Path de la musique actuelle
      */
+    @Nullable
     private static String currentPath;
 
     /**
@@ -62,11 +54,13 @@ public class MusicPlayerService extends Service implements
     /**
      * Binder
      */
+    @NonNull
     private final IBinder binder = new MusicPlayerServiceBinder();
 
     /**
      * Caller
      */
+    @NonNull
     private MusicPlayerActivity caller;
 
     /**
@@ -77,6 +71,7 @@ public class MusicPlayerService extends Service implements
     /**
      * Music player
      */
+    @NonNull
     private MediaPlayer musicPlayer;
 
     /**
@@ -88,6 +83,7 @@ public class MusicPlayerService extends Service implements
          *
          * @return Service
          */
+        @NonNull
         public MusicPlayerService getService() {
             return MusicPlayerService.this;
         }
@@ -98,13 +94,14 @@ public class MusicPlayerService extends Service implements
      *
      * @param activity Activity
      */
-    public void setCaller(MusicPlayerActivity activity) {
+    public void setCaller(@NonNull MusicPlayerActivity activity) {
         caller = activity;
     }
 
     /**
      * Service lié
      */
+    @NonNull
     public IBinder onBind(Intent intent) {
         return binder;
     }
@@ -138,16 +135,6 @@ public class MusicPlayerService extends Service implements
         currentPath = null;
 
         musicPlayer = new MediaPlayer();
-        musicPlayer.setLooping(false);
-        musicPlayer.setOnCompletionListener(this);
-
-        /*
-        musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-            @Override
-            public void onPrepared(MediaPlayer mp) {
-                mp.start();
-            }
-        });*/
     }
 
     /**
@@ -164,8 +151,13 @@ public class MusicPlayerService extends Service implements
      * @param uriStr URI
      * @param shouldPlay Doit jouer ou non
      */
-    public void setMusic(String uriStr, final Boolean shouldPlay) {
+    public void setMusic(@NonNull String uriStr, final Boolean shouldPlay) {
+        if (uriStr.equals(currentPath))
+            return;
+
         Uri uri = Uri.parse(uriStr);
+
+        currentPath = uriStr;
 
         if (musicPlayer.isPlaying()) {
             musicPlayer.pause();
@@ -175,19 +167,27 @@ public class MusicPlayerService extends Service implements
         musicPlayer.reset();
         pos = 0;
 
+        musicPlayer.setLooping(false);
+        musicPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                currentPath = "";
+                caller.onMusicFinished();
+            }
+        });
+        musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
+            @Override
+            public void onPrepared(MediaPlayer mp) {
+                if (shouldPlay) {
+                    isPlaying = true;
+                    mp.start();
+                }
+            }
+        });
+
         try {
             musicPlayer.setDataSource(getApplicationContext(), uri);
-            musicPlayer.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-                @Override
-                public void onPrepared(MediaPlayer mp) {
-                    if (shouldPlay) {
-                        isPlaying = true;
-                        mp.start();
-                    }
-                }
-            });
             musicPlayer.prepareAsync();
-            musicPlayer.setOnCompletionListener(this);
         }
         catch (Exception e) {
             Toast.makeText(this, "Erreur lors du chargement de la musique", Toast.LENGTH_SHORT).show();
@@ -200,22 +200,11 @@ public class MusicPlayerService extends Service implements
      */
     @Override
     public void onDestroy() {
-        if (musicPlayer.isPlaying()) {
+        if (musicPlayer.isPlaying())
             musicPlayer.stop();
-        }
 
         isRunning = false;
         super.onDestroy();
-    }
-
-    /**
-     * Mediaplayer terminé
-     *
-     * @param mp Mediaplayer
-     */
-    @Override
-    public void onCompletion(MediaPlayer mp) {
-        caller.onMusicFinished();
     }
 
     /**
