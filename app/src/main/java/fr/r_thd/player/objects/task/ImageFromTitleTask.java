@@ -21,6 +21,8 @@ import fr.r_thd.player.objects.Music;
 
 /**
  * Image depuis un titre
+ *
+ * Merci Yohann pour l'inspiration !
  */
 public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
     /**
@@ -50,11 +52,12 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
     protected String doInBackground(@NonNull String... titles) {
         HttpURLConnection connection = null;
         BufferedReader reader = null;
-        String title = titles[0];
+        String title = titles[0].replace("&", "%26");
         String apiKey = API.API_KEY.replace('_', 'i');
+        String json = null;
 
         try {
-            URL url = new URL("https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + title + "&relevanceLanguage=fr-FR&type=video&key=" + apiKey);
+            URL url = new URL("https://youtube.googleapis.com/youtube/v3/search?part=snippet&maxResults=1&q=" + title + "&relevanceLanguage=fr-FR&videoCategoryId=10&type=video&key=" + apiKey);
             connection = (HttpURLConnection) url.openConnection();
             connection.connect();
 
@@ -67,9 +70,9 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
 
             while ((line = reader.readLine()) != null)
                 buffer.append(line).append("\n");
-                // Log.d("Response", "> " + line); // Full response
+                // Log.d("Response", "> " + line); // Réponse complète
 
-            return buffer.toString();
+            json = buffer.toString();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -87,7 +90,7 @@ public class ImageFromTitleTask extends AsyncTask<String, Void, String> {
             }
         }
 
-        return null;
+        return json;
     }
 
     /**
