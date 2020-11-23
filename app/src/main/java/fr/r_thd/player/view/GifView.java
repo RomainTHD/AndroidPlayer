@@ -1,10 +1,12 @@
 package fr.r_thd.player.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Movie;
 import android.graphics.Paint;
 import android.util.AttributeSet;
+import android.util.DisplayMetrics;
 import android.view.View;
 
 import fr.r_thd.player.R;
@@ -29,6 +31,11 @@ public class GifView extends View {
     private Paint paint;
 
     /**
+     * Métriques pour la taille de l'écran
+     */
+    private DisplayMetrics displayMetrics;
+
+    /**
      * Initialisation
      *
      * @param context Contexte
@@ -42,6 +49,8 @@ public class GifView extends View {
         java.io.InputStream is;
         is = context.getResources().openRawResource(R.raw.logo);
         movie = Movie.decodeStream(is);
+
+        displayMetrics = new DisplayMetrics();
     }
 
     public GifView(Context context) {
@@ -66,23 +75,27 @@ public class GifView extends View {
      */
     @Override
     protected void onDraw(Canvas canvas) {
-        canvas.drawColor(0x00000000);
+        canvas.drawColor(getResources().getColor(R.color.transparent, null));
 
         long now = android.os.SystemClock.uptimeMillis();
         if (movieStart == 0) // Début
             movieStart = now;
 
-        if (movie != null) {
-            int dur = movie.duration();
+        int dur = movie.duration();
 
-            if (dur == 0)
-                dur = 1000;
+        if (dur == 0)
+            dur = 1000;
 
-            int relTime = (int) ((now - movieStart) % dur);
-            movie.setTime(relTime);
-            canvas.scale(3, 3, (float) getWidth()/2, (float) getHeight()/2);
-            movie.draw(canvas, (float)(getWidth() - movie.width())/2, (float)(getHeight() - movie.height())/2);
-            invalidate();
-        }
+        ((Activity) getContext()).getWindowManager()
+                .getDefaultDisplay()
+                .getMetrics(displayMetrics);
+
+        float zoom = (float) Math.floor(Math.min((float) displayMetrics.widthPixels / (float) movie.width(), (float) 200 / (float) movie.height()));
+
+        int relTime = (int) ((now - movieStart) % dur);
+        movie.setTime(relTime);
+        canvas.scale(zoom, zoom, (float) getWidth()/2, (float) getHeight()/2);
+        movie.draw(canvas, (float)(getWidth() - movie.width())/2, (float)(getHeight() - movie.height())/2);
+        invalidate();
     }
 }
