@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Player</string>
+    <string name="app_name">RomainPlayer</string>
     <string name="title_activity_playlist">Playlist</string>
 
     <string name="dialog_playlist_title">Créer une playlist</string>
@@ -15,7 +15,7 @@
 
     <string name="chooser_music_title">Ajout d\'une musique</string>
 
-    <string name="desc_home_picture">TODO</string>
+    <string name="desc_home_picture">Logo</string>
     <string name="desc_add_button">Ajouter</string>
     <string name="desc_player_picture">Preview de la musique</string>
     <string name="desc_pause_button">Pause</string>
@@ -35,10 +35,12 @@
     <string name="hint_create_playlist">Créer une playlist</string>
     <string name="hint_detail_playlist">Détails d\'un élément</string>
     <string name="hint_shuffle_playlist">Sélectionne une musique aléatoire</string>
+    <string name="hint_add_music">Ajoute une musique</string>
     <string name="hint_music_title">Titre de la musique</string>
 
     <string name="warn_empty_playlist">Playlist vide</string>
     <string name="warn_no_permissions">Cette application nécessite des permissions pour continuer</string>
+    <string name="warn_empty_name">Nom vide</string>
 
     <string name="err_null_id">ID null</string>
     <string name="err_null_playlist">Playlist nulle</string>
