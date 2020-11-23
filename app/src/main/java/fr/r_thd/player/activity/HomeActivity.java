@@ -86,6 +86,9 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
         playlistAdapter.notifyDataSetChanged();
     }
 
+    /**
+     * Crée la recyclerview
+     */
     private void buildRecyclerView() {
         setContentView(R.layout.activity_home);
 
@@ -168,10 +171,7 @@ public class HomeActivity extends AppCompatActivity implements UpdatableFromDial
             public void onChanged() {
                 super.onChanged();
                 View noResultView = findViewById(R.id.no_result);
-                if (playlistAdapter.getItemCount() == 0)
-                    noResultView.getLayoutParams().height = LinearLayout.LayoutParams.MATCH_PARENT;
-                else
-                    noResultView.getLayoutParams().height = 0;
+                noResultView.getLayoutParams().height = (playlistAdapter.getItemCount() == 0) ? LinearLayout.LayoutParams.MATCH_PARENT : 0;
                 noResultView.requestLayout();
             }
         });
